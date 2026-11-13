@@ -1,0 +1,40 @@
+{
+  "id": "HC-002",
+  "title": "Quiet Resolution",
+  "host": "workstation.rabbit.lab",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  DNS resolver traffic captured on workstation.rabbit.lab. Identify the resolved name.",
+  "hosts": {
+    "workstation.rabbit.lab": {
+      "ip": "10.20.0.15",
+      "ports": {
+        "22/tcp": { "service": "ssh", "version": "OpenSSH 9.6p1 Debian 3" },
+        "53/tcp": { "service": "domain", "version": "ISC BIND 9.18" }
+      }
+    },
+    "dns.rabbit.lab": {
+      "ip": "10.20.0.2",
+      "ports": { "53/tcp": { "service": "domain", "version": "ISC BIND 9.18" } }
+    },
+    "files.rabbit.lab": {
+      "ip": "10.20.0.44",
+      "ports": { "80/tcp": { "service": "http", "version": "nginx 1.24.0" } }
+    }
+  },
+  "dns": {
+    "updates.rabbit.lab": "10.20.0.44",
+    "files.rabbit.lab": "10.20.0.44",
+    "dns.rabbit.lab": "10.20.0.2"
+  },
+  "arp": [["10.20.0.2", "00:11:22:33:44:56", "C", "eth0"]],
+  "files": {
+    "/var/log/lab/dns-capture.log": {
+      "content": "12:04:01.221 10.20.0.15:53211 -> 10.20.0.2:53   Query: A updates.rabbit.lab\n12:04:01.229 10.20.0.2:53 -> 10.20.0.15:53211   Answer: A 10.20.0.44 (TTL 300)\n12:04:04.901 10.20.0.15:53244 -> 10.20.0.2:53   Query: A PTR 44.0.20.10.in-addr.arpa\n12:04:04.933 10.20.0.2:53 -> 10.20.0.15:53244   Answer: PTR files.rabbit.lab (TTL 300)\n12:04:11.402 10.20.0.15:53301 -> 10.20.0.2:53   Query: A files.rabbit.lab\n12:04:11.418 10.20.0.2:53 -> 10.20.0.15:53301   Answer: A 10.20.0.44 (TTL 300)\n"
+    },
+    "/home/analyst/notes/dns-notes.txt": {
+      "content": "Resolver on the lab network is 10.20.0.2. Full capture saved under /var/log/lab.\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    }
+  }
+}

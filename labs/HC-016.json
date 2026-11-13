@@ -1,0 +1,26 @@
+{
+  "id": "HC-016",
+  "title": "First Contact",
+  "host": "training-host",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  Welcome to the Hello Cat lab. A new operator account was provisioned on a training host.",
+  "hosts": {
+    "training-host": {
+      "ip": "10.20.0.12",
+      "ports": { "22/tcp": { "service": "ssh", "version": "OpenSSH 9.6p1 Debian 3" } }
+    }
+  },
+  "dns": {},
+  "arp": [],
+  "files": {
+    "/home/analyst/welcome.txt": {
+      "content": "Welcome, analyst.\nYour first lab token is Base64-encoded below:\nd2VsY29tZV9ob21l\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    },
+    "/home/operator/welcome.txt": {
+      "content": "Welcome, operator.\nYour first lab token is Base64-encoded below:\nd2VsY29tZV9ob21l\n",
+      "mode": 420, "owner": "operator", "group": "operator", "uid": 1001, "gid": 1001
+    }
+  }
+}

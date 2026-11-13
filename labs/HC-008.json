@@ -1,0 +1,26 @@
+{
+  "id": "HC-008",
+  "title": "Departure Board",
+  "host": "kali-lab",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  Public artefacts from a synthetic persona were collected for an OSINT exercise.",
+  "hosts": {
+    "kali-lab": {
+      "ip": "10.20.0.33",
+      "ports": { "22/tcp": { "service": "ssh", "version": "OpenSSH 9.6p1 Debian 3" } }
+    }
+  },
+  "dns": {},
+  "arp": [],
+  "files": {
+    "/home/analyst/Desktop/social-posts.txt": {
+      "content": "Collected public posts for the synthetic persona @white_rabbit_travel\n\n12:02 - \"Early flight from CMN, coffee first.\"\n12:05 - Photo caption: \"Maroc Telecom wifi is reliable today.\"\n12:11 - Post tagged: Casablanca, Morocco\n12:14 - Reply to @airportwatch: \"CMN again. Always the long walk.\"\n12:20 - \"Landed. Onwards.\"\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    },
+    "/home/analyst/notes/osint-brief.txt": {
+      "content": "Objective: the IATA code the persona wrote in their own post.\nAirports mentioned in passing are context, not the answer.\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    }
+  }
+}

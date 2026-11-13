@@ -1,0 +1,29 @@
+{
+  "id": "HC-001",
+  "title": "System Whisper",
+  "host": "white-rabbit",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  Lab host white-rabbit captured. Identify the workstation hostname.",
+  "hosts": {
+    "white-rabbit": {
+      "ip": "10.20.0.15",
+      "server": "OpenSSH 9.6p1 Debian",
+      "ports": {
+        "22/tcp": { "service": "ssh", "version": "OpenSSH 9.6p1 Debian 3" }
+      }
+    }
+  },
+  "dns": { "white-rabbit": "10.20.0.15" },
+  "arp": [["10.20.0.1", "00:11:22:33:44:55", "C", "eth0"]],
+  "files": {
+    "/etc/hostname": { "content": "white-rabbit\n" },
+    "/etc/hosts": {
+      "content": "127.0.0.1\tlocalhost\n127.0.1.1\twhite-rabbit\n10.20.0.15\twhite-rabbit.rabbit.lab\n"
+    },
+    "/home/analyst/notes/system-info.txt": {
+      "content": "$ uname -a\nLinux white-rabbit 6.6.1-lab #1 SMP PREEMPT_DYNAMIC x86_64 GNU/Linux\n$ whoami\nanalyst\n$ hostname\nwhite-rabbit\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "HC-009",
+  "title": "One Password, Many Doors",
+  "host": "auth-gateway",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  A lab authentication log was captured. Name the attack technique.",
+  "hosts": {
+    "auth-gateway": {
+      "ip": "10.20.0.10",
+      "ports": {
+        "22/tcp": { "service": "ssh", "version": "OpenSSH 9.6p1 Debian 3" },
+        "389/tcp": { "service": "ldap", "version": "OpenLDAP 2.6" }
+      }
+    }
+  },
+  "dns": {},
+  "arp": [["10.20.0.10", "00:11:22:33:44:10", "C", "eth0"]],
+  "files": {
+    "/var/log/lab/auth.log": {
+      "content": "02:01:11 LOGIN FAIL user=alice   src=198.51.100.23 attempts=1\n02:01:14 LOGIN FAIL user=bob     src=198.51.100.23 attempts=1\n02:01:18 LOGIN FAIL user=carol   src=198.51.100.23 attempts=1\n02:01:21 LOGIN FAIL user=dave    src=198.51.100.23 attempts=1\n02:01:26 LOGIN FAIL user=erin    src=198.51.100.23 attempts=1\n02:01:29 LOGIN FAIL user=frank   src=198.51.100.23 attempts=1\n02:01:33 LOGIN FAIL user=grace   src=198.51.100.23 attempts=1\n02:01:36 LOGIN FAIL user=heidi   src=198.51.100.23 attempts=1\n02:01:39 LOGIN FAIL user=ivan    src=198.51.100.23 attempts=1\n02:02:02 LOGIN OK   user=svc_backup src=198.51.100.23\n02:02:40 LOGIN OK   user=alice     src=10.20.0.33\n",
+      "mode": 420, "owner": "root", "group": "root", "uid": 0, "gid": 0
+    },
+    "/var/log/lab/auth-summary.txt": {
+      "content": "Total failures: 9, all from a single source address.\nTotal successes: 2, one of them from the same source address.\nDistinct usernames in the burst: 9\nDistinct passwords: not logged (accepted on first try for svc_backup)\n",
+      "mode": 420, "owner": "root", "group": "root", "uid": 0, "gid": 0
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "HC-017",
+  "title": "Second Contact",
+  "host": "training-host",
+  "user": "operator",
+  "cwd": "/home/operator",
+  "banner": "  Day two on the Hello Cat training host. The operator account still holds the day one artefacts.",
+  "hosts": {
+    "training-host": {
+      "ip": "10.20.0.12",
+      "ports": { "22/tcp": { "service": "ssh", "version": "OpenSSH 9.6p1 Debian 3" } }
+    }
+  },
+  "dns": {},
+  "arp": [],
+  "files": {
+    "/home/operator/welcome.txt": {
+      "content": "Welcome, operator.\nYour first lab token is Base64-encoded below:\nd2VsY29tZV9ob21l\n",
+      "mode": 420, "owner": "operator", "group": "operator", "uid": 1001, "gid": 1001
+    },
+    "/home/operator/notes.txt": {
+      "content": "Training log - day 2\n-------------------\nDay one was a handshake rehearsal. The welcome token was a\ngift, not a credential.\n\nThe real session token for this host is still here, but the\ninstructor did not leave it where a plain `ls` would show it.\nThe encoding changed with it as well.\n\nRotate the token before you leave the lab.\n",
+      "mode": 420, "owner": "operator", "group": "operator", "uid": 1001, "gid": 1001
+    },
+    "/home/operator/.session_token": {
+      "content": "6865785f68616e647368616b65\n",
+      "mode": 420, "owner": "operator", "group": "operator", "uid": 1001, "gid": 1001
+    },
+    "/home/operator/.session_token.old": {
+      "content": "c3RhbGVfaGFuZHNoYWtl\n",
+      "mode": 420, "owner": "operator", "group": "operator", "uid": 1001, "gid": 1001
+    },
+    "/home/operator/.bash_history": {
+      "content": "ls\ncat welcome.txt\nbase64 -d welcome.txt\n",
+      "mode": 420, "owner": "operator", "group": "operator", "uid": 1001, "gid": 1001
+    }
+  }
+}

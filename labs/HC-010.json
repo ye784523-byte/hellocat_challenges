@@ -1,0 +1,26 @@
+{
+  "id": "HC-010",
+  "title": "White Rabbit Vigenere",
+  "host": "crypto-lab",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  A repeating-key Vigenere message was intercepted. The key is CAT.",
+  "hosts": {
+    "crypto-lab": {
+      "ip": "10.20.0.61",
+      "ports": { "22/tcp": { "service": "ssh", "version": "OpenSSH 9.6p1 Debian 3" } }
+    }
+  },
+  "dns": {},
+  "arp": [],
+  "files": {
+    "/home/analyst/notes/cipher.txt": {
+      "content": "cipher: vigenere\nkey: CAT\nciphertext:\n  hoenop vhx yhbve kcbukt\n\nSpaces are preserved for readability but are not part of the encryption.\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    },
+    "/home/analyst/decrypt.py": {
+      "content": "cipher = \"hoenop vhx yhbve kcbukt\"\nkey = \"CAT\"\n\nplain = []\nindex = 0\nfor ch in cipher:\n    if ch == \" \":\n        plain.append(ch)\n        continue\n    shift = ord(key[index % len(key)]) - ord(\"A\")\n    plain.append(chr((ord(ch) - ord(\"a\") - shift + 26) % 26 + ord(\"a\")))\n    index += 1\n\nprint(\"\".join(plain))\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    }
+  }
+}

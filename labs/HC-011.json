@@ -1,0 +1,35 @@
+{
+  "id": "HC-011",
+  "title": "Unsigned Visitor",
+  "host": "api-gateway",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  A JWT was captured during an authorised review of a fictional API.",
+  "hosts": {
+    "api-gateway": {
+      "ip": "10.20.0.80",
+      "server": "nginx/1.24.0",
+      "ports": {
+        "443/tcp": { "service": "https", "version": "nginx 1.24.0" },
+        "80/tcp": { "service": "http", "version": "nginx 1.24.0" }
+      }
+    }
+  },
+  "dns": { "api.rabbit.lab": "10.20.0.80" },
+  "arp": [],
+  "webroot": {
+    "/index.html": "<!doctype html>\n<html><body><h1>Lab API</h1><p>Use the X-Auth-Token header.</p></body></html>\n",
+    "/.well-known/openid-configuration": "{\"issuer\":\"https://api.rabbit.lab\",\"jwks_uri\":\"https://api.rabbit.lab/.well-known/jwks.json\"}\n",
+    "/.well-known/jwks.json": "{\"keys\":[]}\n"
+  },
+  "files": {
+    "/home/analyst/notes/token.txt": {
+      "content": "Captured Authorization: Bearer header\n\n  eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxMjM0IiwiYWRtaW4iOnRydWV9.\n\nThe payload is not required to answer the question.\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    },
+    "/home/analyst/jwt-header.txt": {
+      "content": "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    }
+  }
+}

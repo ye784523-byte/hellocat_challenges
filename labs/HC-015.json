@@ -1,0 +1,30 @@
+{
+  "id": "HC-015",
+  "title": "Nested Signal",
+  "host": "exfil-host",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  A two-layer encoded message was recovered during an authorised exfiltration exercise.",
+  "hosts": {
+    "exfil-host": {
+      "ip": "10.20.0.91",
+      "ports": { "22/tcp": { "service": "ssh", "version": "OpenSSH 9.6p1 Debian 3" } }
+    }
+  },
+  "dns": {},
+  "arp": [],
+  "files": {
+    "/home/analyst/artifacts/exfil.txt": {
+      "content": "exfiltration payload (two layers)\n\n  5a32687663335167615734676447686c49484e6f5a577873\n\nLayer 1: hexadecimal\nLayer 2: base64\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    },
+    "/home/analyst/artifacts/payload.hex": {
+      "content": "5a32687663335167615734676447686c49484e6f5a577873\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    },
+    "/home/analyst/decode.py": {
+      "content": "import base64\n\npayload = \"5a32687663335167615734676447686c49484e6f5a577873\"\nraw = bytes.fromhex(payload)\nprint(base64.b64decode(raw.decode()))\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    }
+  }
+}

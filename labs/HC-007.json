@@ -1,0 +1,26 @@
+{
+  "id": "HC-007",
+  "title": "Ghost in the History",
+  "host": "forensics-image",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  A compromised host was imaged. The shell history was recovered from the analyst account.",
+  "hosts": {
+    "forensics-image": {
+      "ip": "10.20.0.77",
+      "ports": { "22/tcp": { "service": "ssh", "version": "OpenSSH 8.9p1 Debian 3" } }
+    }
+  },
+  "dns": {},
+  "arp": [],
+  "files": {
+    "/home/analyst/.bash_history": {
+      "content": "ls\ncd ~\ncat notes/todo.txt\nsudo nmap -sV -p- 10.20.0.44\ngobuster dir -u http://vault.rabbit.lab -w /usr/share/wordlists/dirb/common.txt\nstrings artifact.bin | grep -i 'rabbit'\nmkdir -p /tmp/.cache/ops\nscp analyst@10.20.0.9:/srv/reports/reports.zip /tmp/.cache/hold.dat\nunzip -q /tmp/.cache/hold.dat -d /tmp/.cache/ops\nrm -rf /tmp/.cache/ops /tmp/.cache/hold.dat\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    },
+    "/var/log/lab/evidence.txt": {
+      "content": "Timeline notes\n- A staging archive was copied in and then renamed\n- The original directory was removed immediately afterwards\n",
+      "mode": 420, "owner": "root", "group": "root", "uid": 0, "gid": 0
+    }
+  }
+}

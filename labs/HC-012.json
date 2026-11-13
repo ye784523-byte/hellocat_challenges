@@ -1,0 +1,31 @@
+{
+  "id": "HC-012",
+  "title": "Duplicate Gateway",
+  "host": "segment-10.20.0.0",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  The lab IDS recorded repeated ARP claims on the internal segment.",
+  "hosts": {
+    "segment-10.20.0.0": {
+      "ip": "10.20.0.1",
+      "ports": { "22/tcp": { "service": "ssh", "version": "OpenSSH 9.6p1 Debian 3" } }
+    }
+  },
+  "dns": {},
+  "arp": [
+    ["10.20.0.1", "00:11:22:33:44:55", "C", "eth0"],
+    ["10.20.0.1", "de:ad:be:ef:00:66", "C", "eth0"],
+    ["10.20.0.66", "de:ad:be:ef:00:66", "C", "eth0"],
+    ["10.20.0.33", "00:11:22:33:44:66", "C", "eth0"]
+  ],
+  "files": {
+    "/var/log/lab/arp.log": {
+      "content": "02:14:01 arp who-has 10.20.0.1 tell 10.20.0.66\n02:14:01 arp reply 10.20.0.1 is-at de:ad:be:ef:00:66\n02:14:04 arp reply 10.20.0.1 is-at de:ad:be:ef:00:66\n02:14:09 arp reply 10.20.0.1 is-at de:ad:be:ef:00:66\n02:14:14 arp reply 10.20.0.1 is-at de:ad:be:ef:00:66\n02:14:19 arp reply 10.20.0.1 is-at de:ad:be:ef:00:66\n02:14:24 arp reply 10.20.0.1 is-at de:ad:be:ef:00:66\n",
+      "mode": 420, "owner": "root", "group": "root", "uid": 0, "gid": 0
+    },
+    "/var/log/lab/gateway.txt": {
+      "content": "Known good: the real gateway is 10.20.0.1 with MAC 00:11:22:33:44:55\n",
+      "mode": 420, "owner": "root", "group": "root", "uid": 0, "gid": 0
+    }
+  }
+}

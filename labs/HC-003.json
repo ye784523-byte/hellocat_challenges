@@ -1,0 +1,43 @@
+{
+  "id": "HC-003",
+  "title": "Robots Never Lie",
+  "host": "vault.rabbit.lab",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  A fictional web application is running at vault.rabbit.lab. Find what the author hid.",
+  "hosts": {
+    "vault.rabbit.lab": {
+      "ip": "10.20.0.44",
+      "server": "nginx/1.24.0",
+      "poweredBy": "PHP/8.2.7",
+      "ports": {
+        "80/tcp": { "service": "http", "version": "nginx 1.24.0" },
+        "443/tcp": { "service": "https", "version": "nginx 1.24.0" },
+        "22/tcp": { "service": "ssh", "version": "OpenSSH 9.6p1 Debian 3" }
+      }
+    }
+  },
+  "dns": { "vault.rabbit.lab": "10.20.0.44" },
+  "arp": [["10.20.0.44", "00:11:22:33:44:77", "C", "eth0"]],
+  "webroot": {
+    "/index.html": "<!doctype html>\n<html><head><title>Vault Lab</title></head>\n<body><h1>Vault Lab</h1><p>Internal application. Authorized personnel only.</p></body></html>\n",
+    "/robots.txt": "User-agent: *\nDisallow: /admin\nDisallow: /backup-2026\nDisallow: /vault\nAllow: /\n",
+    "/admin": "<!doctype html>\n<html><body><h1>Admin</h1><p>Login required.</p></body></html>\n",
+    "/backup-2026": "<!doctype html>\n<html><body><h1>Backup 2026</h1><p>Directory index.</p></body></html>\n",
+    "/vault": "<!doctype html>\n<html><body><h1>Vault</h1><p>Restricted area.</p></body></html>\n",
+    "/login": "<!doctype html>\n<html><body><form action=\"/login\" method=\"post\"><input name=\"user\"><input name=\"pass\" type=\"password\"><button>Sign in</button></form></body></html>\n",
+    "/health": "ok\n"
+  },
+  "nikto": [
+    "\"/admin/\" contains a link to an uninteresting directory",
+    "\"/backup-2026/\" might be interesting",
+    "\"/vault/\" might be interesting",
+    "Server leaks inodes via /etc/passwd"
+  ],
+  "files": {
+    "/home/analyst/notes/target.txt": {
+      "content": "Target: vault.rabbit.lab (10.20.0.44)\nWordlist: /usr/share/wordlists/dirb/common.txt\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    }
+  }
+}

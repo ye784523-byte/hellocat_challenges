@@ -1,0 +1,26 @@
+{
+  "id": "HC-004",
+  "title": "Rabbit Rotation",
+  "host": "kali-lab",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  An intercepted ROT13 phrase was dropped into the analyst notes directory.",
+  "hosts": {
+    "kali-lab": {
+      "ip": "10.20.0.33",
+      "ports": { "22/tcp": { "service": "ssh", "version": "OpenSSH 9.6p1 Debian 3" } }
+    }
+  },
+  "dns": {},
+  "arp": [],
+  "files": {
+    "/home/analyst/notes/intercept.txt": {
+      "content": "Message intercepted from the terminal of an unknown operator.\nEncoding: ROT13\n\n  gur juvgr enoovg\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    },
+    "/home/analyst/notes/encoding-hints.txt": {
+      "content": "ROT13 rotates the alphabet by 13 places. `tr` can do it:\n  tr 'a-z' 'n-za-m'\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    }
+  }
+}

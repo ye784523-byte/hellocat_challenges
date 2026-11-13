@@ -1,0 +1,30 @@
+{
+  "id": "HC-014",
+  "title": "Timeline Weaver",
+  "host": "forensics-image",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  An incident timeline was reconstructed from multiple fictional sources.",
+  "hosts": {
+    "forensics-image": {
+      "ip": "10.20.0.77",
+      "ports": { "22/tcp": { "service": "ssh", "version": "OpenSSH 8.9p1 Debian 3" } }
+    },
+    "files.rabbit.lab": {
+      "ip": "10.20.0.44",
+      "ports": { "80/tcp": { "service": "http", "version": "nginx 1.24.0" } }
+    }
+  },
+  "dns": { "files.rabbit.lab": "10.20.0.44" },
+  "arp": [["10.20.0.44", "00:11:22:33:44:77", "C", "eth0"]],
+  "files": {
+    "/var/log/lab/timeline.log": {
+      "content": "02:13:40 DNS   files.rabbit.lab -> 10.20.0.44\n02:14:02 AUTH  login OK user=analyst src=10.20.0.33\n02:14:37 PROXY GET /pack.zip 200 bytes=48211 client=10.20.0.33\n02:15:01 PROC  curl -s http://files.rabbit.lab/pack.zip -o /tmp/pack.zip\n02:15:44 AUTH  sudo user=analyst cmd=/usr/bin/unzip\n02:16:12 PROC  unzip -o /tmp/pack.zip -d /tmp/pack\n",
+      "mode": 420, "owner": "root", "group": "root", "uid": 0, "gid": 0
+    },
+    "/var/log/lab/proxy.log": {
+      "content": "10.20.0.33 - - [11/Nov/2026:02:14:37 +0000] \"GET /pack.zip HTTP/1.1\" 200 48211 \"curl/8.5.0\"\n10.20.0.52 - - [11/Nov/2026:02:14:51 +0000] \"GET /index.html HTTP/1.1\" 200 512 \"Mozilla/5.0\"\n",
+      "mode": 420, "owner": "root", "group": "root", "uid": 0, "gid": 0
+    }
+  }
+}

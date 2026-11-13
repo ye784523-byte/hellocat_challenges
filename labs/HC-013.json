@@ -1,0 +1,26 @@
+{
+  "id": "HC-013",
+  "title": "Encoded Artifact",
+  "host": "forensics-image",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  A memory artifact was exported during an authorised forensics lab.",
+  "hosts": {
+    "forensics-image": {
+      "ip": "10.20.0.77",
+      "ports": { "22/tcp": { "service": "ssh", "version": "OpenSSH 8.9p1 Debian 3" } }
+    }
+  },
+  "dns": {},
+  "arp": [],
+  "files": {
+    "/home/analyst/artifacts/memory-export.txt": {
+      "content": "memory export (fragment)\n\n  SEN7Zm9yZW5zaWNzX2FydGlmYWN0XzQyfQ==\n\nThe instructor identifies the encoding as Base64.\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    },
+    "/home/analyst/artifacts/artifact.b64": {
+      "content": "SEN7Zm9yZW5zaWNzX2FydGlmYWN0XzQyfQ==\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    }
+  }
+}

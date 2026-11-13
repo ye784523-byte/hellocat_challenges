@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <title>Hello Cat // Web Terminal</title>
+    <link rel="stylesheet" href="/vendor/xterm.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b0f0c'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle' fill='%2300ff88' font-family='monospace'%3E%E2%98%80%3C/text%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <div id="boot" class="boot">
+      <div class="boot__inner">
+        <pre class="boot__logo">   ▄▄▄▄▄▄   ▄▄▄▄▄▄▄▄▄▄
+  ██▀▀▀██  ██▀▀▀██  ██▀▀▀██
+  ██    ██ ██    ██ ██    ██
+  ██▄▄▄██  ██▄▄▄██  ██▄▄▄██
+   ▀▀▀▀▀▀   ▀▀▀▀▀▀▀▀▀▀
+      HELLO CAT</pre>
+        <p class="boot__status" id="boot-status">Initialising lab environment…</p>
+      </div>
+    </div>
+
+    <div class="shell" id="shell" hidden>
+      <header class="topbar">
+        <div class="topbar__brand">
+          <span class="topbar__mark">◉</span>
+          <span class="topbar__name">HELLO CAT</span>
+          <span class="topbar__tag">WEB TERMINAL</span>
+        </div>
+        <div class="topbar__right">
+          <span class="chip chip--xp" title="Experience points">XP <b id="stat-xp">0</b></span>
+          <span class="chip chip--solved" title="Challenges solved">SOLVED <b id="stat-solved">0</b></span>
+          <button class="iconbtn" id="btn-labs" title="Toggle the challenge panel" aria-label="Toggle challenge panel">☰</button>
+          <div class="profile">
+            <img id="avatar" alt="" class="profile__avatar" />
+            <span class="profile__name" id="profile-name">operator</span>
+            <a class="profile__logout" href="/auth/logout" title="Sign out">⎋</a>
+          </div>
+        </div>
+      </header>
+
+      <main class="layout">
+        <aside class="panel" id="panel">
+          <div class="panel__head">
+            <h2>CHALLENGES</h2>
+            <span class="panel__count" id="challenge-count">0</span>
+          </div>
+          <input
+            class="panel__search"
+            id="challenge-search"
+            type="search"
+            placeholder="Search challenges…"
+            autocomplete="off"
+            aria-label="Search challenges"
+          />
+          <div class="panel__filters" id="challenge-filters">
+            <button class="pill pill--active" data-filter="all">ALL</button>
+            <button class="pill" data-filter="solved">SOLVED</button>
+            <button class="pill" data-filter="unsolved">OPEN</button>
+          </div>
+          <ul class="challenges" id="challenge-list"></ul>
+          <footer class="panel__foot">
+            <span>All systems are fictional.</span>
+            <span>No host commands execute.</span>
+          </footer>
+        </aside>
+
+        <section class="stage">
+          <div class="stage__bar">
+            <div class="stage__objective" id="stage-objective">
+              <span class="stage__label">NO CHALLENGE LOADED</span>
+              <span class="stage__hint">Pick one from the panel, or type <code>challenges</code>.</span>
+            </div>
+            <div class="stage__actions">
+              <button class="btn" id="btn-hint" type="button">HINT</button>
+              <button class="btn btn--primary" id="btn-submit" type="button">SUBMIT FLAG</button>
+            </div>
+          </div>
+
+          <div class="terminal" id="terminal"></div>
+
+          <form class="flagbar" id="flag-form" hidden>
+            <label class="flagbar__label" for="flag-input">FLAG</label>
+            <input
+              class="flagbar__input"
+              id="flag-input"
+              name="flag"
+              placeholder="HC{...}"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button class="btn btn--primary" type="submit">SUBMIT</button>
+            <button class="btn btn--ghost" id="flag-cancel" type="button">CANCEL</button>
+          </form>
+
+          <div class="toast" id="toast" hidden></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/vendor/xterm.js"></script>
+    <script src="/fit-addon.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

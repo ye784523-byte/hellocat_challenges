@@ -1,0 +1,26 @@
+{
+  "id": "HC-006",
+  "title": "XOR Gate",
+  "host": "kali-lab",
+  "user": "analyst",
+  "cwd": "/home/analyst",
+  "banner": "  A programming exercise was left on the workstation. Trace it and report the output.",
+  "hosts": {
+    "kali-lab": {
+      "ip": "10.20.0.33",
+      "ports": { "22/tcp": { "service": "ssh", "version": "OpenSSH 9.6p1 Debian 3" } }
+    }
+  },
+  "dns": {},
+  "arp": [],
+  "files": {
+    "/home/analyst/gate.py": {
+      "content": "def gate(tokens):\n    result = 0\n    for token in tokens:\n        if token % 2 == 0:\n            result ^= token\n    return result\n\nprint(gate([3, 4, 6, 7, 8]))\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    },
+    "/home/analyst/notes/README.txt": {
+      "content": "The instructor drops exercises in the home directory.\nRun them with: python3 <file>\n",
+      "owner": "analyst", "group": "analysts", "uid": 1000, "gid": 1000
+    }
+  }
+}
