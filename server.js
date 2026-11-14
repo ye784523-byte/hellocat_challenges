@@ -37,9 +37,9 @@ import {
 } from './lib/proxy.js';
 import { SessionStore } from './lib/session.js';
 import { commandCatalogue } from './lib/commands/index.js';
-import { createStorage, initStorage, flushStorage } from '../src/storage/index.js';
-import { createServices } from '../src/services/index.js';
-import { createLogger } from '../src/utils/logger.js';
+import { createStorage, initStorage, flushStorage } from './src/storage/index.js';
+import { createServices } from './src/services/index.js';
+import { createLogger } from './src/utils/logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

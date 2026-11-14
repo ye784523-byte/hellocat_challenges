@@ -6,7 +6,7 @@
 
 import 'dotenv/config';
 import { loadWebConfig, assertWebConfig, webConfigWarnings } from './lib/config.js';
-import { createLogger } from '../src/utils/logger.js';
+import { createLogger } from './src/utils/logger.js';
 import { createWebServer } from './server.js';
 
 async function main() {

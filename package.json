@@ -1,0 +1,28 @@
+{
+  "name": "hellocat-challenges",
+  "version": "1.0.0",
+  "description": "Hello Cat web terminal - the browser based CTF lab.",
+  "type": "module",
+  "main": "index.js",
+  "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "web": "node index.js",
+    "lint": "find . -name '*.js' -not -path './node_modules/*' -exec node --check {} \\;"
+  },
+  "keywords": [
+    "ctf",
+    "cybersecurity",
+    "terminal",
+    "discord"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5",
+    "zod": "^3.23.8"
+  }
+}
