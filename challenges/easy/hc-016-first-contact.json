@@ -1,0 +1,18 @@
+{
+  "id": "HC-016",
+  "title": "First Contact",
+  "description": "Welcome to the Hello Cat lab. A new operator account named `operator` was provisioned on a fictional training host. The instructor captured this simulated shell session:\n\n```\n$ whoami\noperator\n$ pwd\n/home/operator\n$ ls -la\ntotal 20\ndrwxr-xr-x 2 operator operator 4096 Nov 11 09:00 .\ndrwxr-xr-x 3 root     root     4096 Nov 11 08:55 ..\n-rw-r--r-- 1 operator operator  184 Nov 11 09:00 welcome.txt\n$ cat welcome.txt\nWelcome, operator.\nYour first lab token is Base64-encoded below:\nd2VsY29tZV9ob21l\n```\n\nThis exercise only uses a fictional, isolated host. The goal is to practice reading a file from the terminal and decoding the token it contains.",
+  "objective": "Decode the Base64 token from `welcome.txt` and submit it as HC{token}.",
+  "category": "Linux",
+  "difficulty": "Easy",
+  "xp": 100,
+  "flag": "HC{welcome_home}",
+  "hints": [
+    { "text": "The `cat` command prints the contents of a file to the terminal.", "cost": 0 },
+    { "text": "The string in `welcome.txt` is Base64; decode it to reveal the token.", "cost": 20 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{...}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

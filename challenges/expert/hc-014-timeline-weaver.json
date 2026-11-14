@@ -1,0 +1,18 @@
+{
+  "id": "HC-014",
+  "title": "Timeline Weaver",
+  "description": "An authorized forensics lab reconstructed a fictional incident timeline from multiple sources:\n\n```\n02:13:40 DNS   files.rabbit.lab -> 10.20.0.44\n02:14:02 AUTH  login OK user=analyst src=10.20.0.33\n02:14:37 PROXY GET /pack.zip 200 bytes=48211 client=10.20.0.33\n02:15:01 PROC  curl -s http://files.rabbit.lab/pack.zip -o /tmp/pack.zip\n02:15:44 AUTH  sudo user=analyst cmd=/usr/bin/unzip\n```\n\nOne internal source address initiated the download and performed the later privilege escalation.",
+  "objective": "Submit the internal source IP as HC{ip}.",
+  "category": "Digital Forensics",
+  "difficulty": "Expert",
+  "xp": 450,
+  "flag": "HC{10.20.0.33}",
+  "hints": [
+    { "text": "Correlate the AUTH, PROXY and PROC lines by timestamp.", "cost": 0 },
+    { "text": "The DNS server is not the client that downloaded the archive.", "cost": 60 }
+  ],
+  "maxAttempts": 4,
+  "flagFormat": "HC{ip}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

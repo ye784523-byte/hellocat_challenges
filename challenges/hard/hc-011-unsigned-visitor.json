@@ -1,0 +1,18 @@
+{
+  "id": "HC-011",
+  "title": "Unsigned Visitor",
+  "description": "During an authorized lab review of a fictional API, the analyst captured this JWT header segment:\n\n```\neyJhbGciOiJub25lIiwidHlwIjoiSldUIn0\n```\n\nThe payload is not required to answer the question. Decode the header and inspect the declared algorithm.",
+  "objective": "Submit the declared JWT algorithm value as HC{algorithm}.",
+  "category": "Web Security",
+  "difficulty": "Hard",
+  "xp": 300,
+  "flag": "HC{none}",
+  "hints": [
+    { "text": "The header segment is base64url-encoded JSON.", "cost": 0 },
+    { "text": "An algorithm of this value means the token is unsecured.", "cost": 50 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{algorithm}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

@@ -1,0 +1,18 @@
+{
+  "id": "HC-001",
+  "title": "System Whisper",
+  "description": "A fictional security workstation named `white-rabbit` was captured during a lab exercise. The analyst saved this simulated system information:\n\n```\n$ uname -a\nLinux white-rabbit 6.6.1-lab #1 SMP PREEMPT_DYNAMIC x86_64 GNU/Linux\n$ whoami\nanalyst\n```\n\nThe workstation hostname is the first artifact requested by the lab instructor.",
+  "objective": "Submit the workstation hostname wrapped as HC{hostname}.",
+  "category": "Linux",
+  "difficulty": "Easy",
+  "xp": 100,
+  "flag": "HC{white-rabbit}",
+  "hints": [
+    { "text": "The hostname appears immediately after the kernel name in uname output.", "cost": 0 },
+    { "text": "Look at the second token on the uname line.", "cost": 20 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{...}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

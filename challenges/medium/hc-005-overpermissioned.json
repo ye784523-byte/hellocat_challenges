@@ -1,0 +1,18 @@
+{
+  "id": "HC-005",
+  "title": "Overpermissioned",
+  "description": "A fictional Linux host has a scheduled cleanup job. During an authorized lab review, the analyst captured this directory listing:\n\n```\n-rw-r--r-- 1 root    root     2201 Mar  3 09:58 cleanup.conf\n-rwxr-xr-x 1 root    root      914 Mar  3 09:59 cleanup.sh\n-rwxrwxrwx 1 analyst analysts   812 Mar  3 10:00 rotate.sh\n-rw-r--r-- 1 analyst analysts   455 Mar  3 10:00 audit.log\n```\n\nThe instructor asks which file is world-writable.",
+  "objective": "Submit the world-writable filename as HC{filename}.",
+  "category": "Linux",
+  "difficulty": "Medium",
+  "xp": 150,
+  "flag": "HC{rotate.sh}",
+  "hints": [
+    { "text": "Permission triples are owner, group, other. Look for `rwx` in the final triple.", "cost": 0 },
+    { "text": "A mode of `rwxrwxrwx` means everyone can write to the file.", "cost": 25 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{...}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

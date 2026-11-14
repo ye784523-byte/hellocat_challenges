@@ -1,0 +1,18 @@
+{
+  "id": "HC-015",
+  "title": "Nested Signal",
+  "description": "A fictional exfiltration exercise left a two-layer encoded message. The instructor confirms the layers are hexadecimal and then Base64:\n\n```\n5a32687663335167615734676447686c49484e6f5a577873\n```\n\nDecode the hex bytes to obtain a Base64 string, then decode that string.",
+  "objective": "Recover the final plaintext and submit it as HC{plaintext_with_underscores} (lowercase, spaces replaced by underscores).",
+  "category": "Cryptography",
+  "difficulty": "Expert",
+  "xp": 450,
+  "flag": "HC{ghost_in_the_shell}",
+  "hints": [
+    { "text": "Hex-decode first: the result should look like a Base64 string ending in no padding.", "cost": 0 },
+    { "text": "The final phrase starts with 'ghost'.", "cost": 60 }
+  ],
+  "maxAttempts": 4,
+  "flagFormat": "HC{plaintext_with_underscores}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

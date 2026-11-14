@@ -1,0 +1,20 @@
+{
+  "id": "HC-017",
+  "title": "Second Contact",
+  "description": "Day two on the same fictional training host. The `operator` account was left with more artefacts:\n\n```\n$ cd /home/operator\n$ ls -la\ntotal 24\ndrwxr-xr-x 3 operator operator 4096 Nov 12 08:40 .\ndrwxr-xr-x 3 root     root     4096 Nov 11 08:55 ..\n-rw-r--r-- 1 operator operator  184 Nov 11 09:00 welcome.txt\n-rw-r--r-- 1 operator operator  310 Nov 12 08:38 notes.txt\n```\n\nThe training log claims the real session token is still on this host, but the instructor did not leave it where a plain `ls` shows it. The encoding changed as well.\n\nThis exercise only uses a fictional, isolated host. The goal is to practise hidden-file discovery and a second encoding on top of the first contact.",
+  "objective": "Find the hidden session token in the operator home directory, decode it and submit the value as HC{value}.",
+  "category": "Linux",
+  "difficulty": "Medium",
+  "xp": 150,
+  "flag": "HC{hex_handshake}",
+  "prerequisites": ["HC-016"],
+  "hints": [
+    { "text": "`ls` hides dotfiles by default. Add the `-a` flag to see every entry in the directory.", "cost": 0 },
+    { "text": "The live token is stored in a file called `.session_token` inside `/home/operator`.", "cost": 20 },
+    { "text": "That file holds a hex string. `xxd -r -p .session_token` turns it back into readable text.", "cost": 30 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{...}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

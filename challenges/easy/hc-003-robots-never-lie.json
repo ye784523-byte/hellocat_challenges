@@ -1,0 +1,17 @@
+{
+  "id": "HC-003",
+  "title": "Robots Never Lie",
+  "description": "A fictional web application exposes the following `robots.txt` during an authorized lab assessment:\n\n```\nUser-agent: *\nDisallow: /admin\nDisallow: /backup-2026\nDisallow: /vault\nAllow: /\n```\n\nThe lab asks for the most sensitive-looking path that the site author tried to hide.",
+  "objective": "Submit the hidden vault path as HC{/path}.",
+  "category": "Web Security",
+  "difficulty": "Easy",
+  "xp": 100,
+  "flag": "HC{/vault}",
+  "hints": [
+    { "text": "There are three disallowed paths. One name suggests stored secrets.", "cost": 0 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{/path}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

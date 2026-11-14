@@ -1,0 +1,17 @@
+{
+  "id": "HC-007",
+  "title": "Ghost in the History",
+  "description": "A fictional compromised host was imaged for forensics. The analyst found this excerpt in `~/.bash_history`:\n\n```\nmkdir -p /tmp/.cache/ops\nscp analyst@10.20.0.9:/srv/reports/reports.zip /tmp/.cache/hold.dat\nunzip -q /tmp/.cache/hold.dat -d /tmp/.cache/ops\nrm -rf /tmp/.cache/ops /tmp/.cache/hold.dat\n```\n\nThe staging archive was moved under a different name before deletion.",
+  "objective": "Submit the hidden staging filename as HC{filename}.",
+  "category": "Digital Forensics",
+  "difficulty": "Medium",
+  "xp": 150,
+  "flag": "HC{hold.dat}",
+  "hints": [
+    { "text": "Follow the scp destination path, not the original source name.", "cost": 0 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{filename}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

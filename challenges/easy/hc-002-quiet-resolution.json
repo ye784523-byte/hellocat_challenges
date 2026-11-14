@@ -1,0 +1,17 @@
+{
+  "id": "HC-002",
+  "title": "Quiet Resolution",
+  "description": "A simulated packet capture contains this DNS exchange from the fictional `rabbit.lab` network:\n\n```\n12:04:01.221 10.20.0.15:53211 -> 10.20.0.2:53\n  Query: A updates.rabbit.lab\n12:04:01.229 10.20.0.2:53 -> 10.20.0.15:53211\n  Answer: A 10.20.0.44 (TTL 300)\n```\n\nThe instructor asks which fully qualified domain name was resolved.",
+  "objective": "Submit the resolved domain name as HC{domain}.",
+  "category": "Networking",
+  "difficulty": "Easy",
+  "xp": 100,
+  "flag": "HC{updates.rabbit.lab}",
+  "hints": [
+    { "text": "DNS queries ask for a name and receive an address.", "cost": 0 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{...}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

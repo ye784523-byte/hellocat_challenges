@@ -1,0 +1,18 @@
+{
+  "id": "HC-006",
+  "title": "XOR Gate",
+  "description": "A programming lab asks you to trace this fictional Python snippet:\n\n```python\ndef gate(tokens):\n    result = 0\n    for token in tokens:\n        if token % 2 == 0:\n            result ^= token\n    return result\n\nprint(gate([3, 4, 6, 7, 8]))\n```\n\nXOR (`^`) is applied only to even tokens, in order.",
+  "objective": "Submit the printed integer as HC{value}.",
+  "category": "Programming",
+  "difficulty": "Medium",
+  "xp": 150,
+  "flag": "HC{10}",
+  "hints": [
+    { "text": "Filter the list to even numbers first: 4, 6, 8.", "cost": 0 },
+    { "text": "4 XOR 6 = 2. Continue from there with 8.", "cost": 25 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{value}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

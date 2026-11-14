@@ -39,6 +39,7 @@ import { SessionStore } from './lib/session.js';
 import { commandCatalogue } from './lib/commands/index.js';
 import { createStorage, initStorage, flushStorage } from './src/storage/index.js';
 import { createServices } from './src/services/index.js';
+import { importChallenges } from './src/services/challengeImportService.js';
 import { createLogger } from './src/utils/logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -66,6 +67,37 @@ const TERMINAL_PATH = '/terminal';
 const DEFAULT_OFFICIAL_SITE_URL = 'https://helloc.at';
 const DEFAULT_DISCORD_INVITE_URL = 'https://discord.gg/hellocat';
 
+/**
+ * Publishes the bundled challenge catalogue into the shared store.
+ *
+ * The catalogue lives in the JSON store, which starts empty on a fresh
+ * deployment. The challenge definitions that ship with the application are
+ * imported on every start, so a new deployment is usable right away and an
+ * updated definition replaces the stored one. The import is idempotent.
+ */
+async function seedChallengeCatalogue(services, storage, config, logger) {
+  if (!config.challengesDir) return;
+
+  try {
+    const result = await importChallenges(services.challengeService, config.challengesDir, {
+      publish: true,
+      logger,
+    });
+    if (result.imported.length > 0 || result.updated.length > 0) {
+      logger.info('Challenge catalogue published', {
+        imported: result.imported.length,
+        updated: result.updated.length,
+      });
+    }
+    for (const error of result.errors) {
+      logger.error('Challenge import failed', { file: error.file, error: error.error });
+    }
+    await flushStorage(storage);
+  } catch (error) {
+    logger.error('Could not seed the challenge catalogue', { error: error.message });
+  }
+}
+
 export async function createWebServer({ config, logger }) {
   const storage = createStorage({ dataDir: config.dataDir, logger });
   await initStorage(storage, { logger });
@@ -79,6 +111,8 @@ export async function createWebServer({ config, logger }) {
 
   const labs = await loadLabDefinitions(config.labDir);
   logger.info('Lab environments loaded', { count: labs.size });
+
+  await seedChallengeCatalogue(services, storage, config, logger);
 
   const sessions = new SessionStore({
     challengeService: services.challengeService,

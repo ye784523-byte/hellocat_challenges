@@ -1,0 +1,17 @@
+{
+  "id": "HC-008",
+  "title": "Departure Board",
+  "description": "A fictional OSINT exercise provides these public artifacts from a synthetic persona:\n\n```\n12:02 — \"Early flight from CMN, coffee first.\"\n12:05 — Photo caption: \"Maroc Telecom wifi is reliable today.\"\n12:11 — Post tagged: Casablanca, Morocco\n```\n\nThe lab asks for the IATA airport code visible in the persona's own post.",
+  "objective": "Submit the three-letter IATA code as HC{CODE}.",
+  "category": "OSINT",
+  "difficulty": "Medium",
+  "xp": 150,
+  "flag": "HC{CMN}",
+  "hints": [
+    { "text": "The airport code is already present in the first post.", "cost": 0 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{CODE}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

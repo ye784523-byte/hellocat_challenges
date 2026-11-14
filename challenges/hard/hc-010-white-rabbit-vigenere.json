@@ -1,0 +1,18 @@
+{
+  "id": "HC-010",
+  "title": "White Rabbit Vigenere",
+  "description": "A fictional cryptography lab intercepted a message protected with a repeating-key Vigenere cipher. The key is `CAT`.\n\nCiphertext:\n```\nhoenop vhx yhbve kcbukt\n```\n\nSpaces are preserved for readability but are not part of the encryption.",
+  "objective": "Recover the plaintext and submit it as HC{plaintext_with_underscores} (lowercase, spaces replaced by underscores).",
+  "category": "Cryptography",
+  "difficulty": "Hard",
+  "xp": 300,
+  "flag": "HC{follow_the_white_rabbit}",
+  "hints": [
+    { "text": "Subtract the repeating key letters (C=2, A=0, T=19) from each ciphertext letter.", "cost": 0 },
+    { "text": "The plaintext begins with 'follow'.", "cost": 50 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{plaintext_with_underscores}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

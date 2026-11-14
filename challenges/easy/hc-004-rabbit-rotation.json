@@ -1,0 +1,18 @@
+{
+  "id": "HC-004",
+  "title": "Rabbit Rotation",
+  "description": "An introductory cryptography lab intercepted this ROT13-encoded phrase from a fictional terminal:\n\n```\ngur juvgr enoovg\n```\n\nThe instructor asks you to recover the plaintext.",
+  "objective": "Decode the phrase and submit it as HC{plaintext_with_underscores} (lowercase, spaces replaced by underscores).",
+  "category": "Cryptography",
+  "difficulty": "Easy",
+  "xp": 120,
+  "flag": "HC{the_white_rabbit}",
+  "hints": [
+    { "text": "ROT13 shifts each letter 13 places. Applying it twice restores the original.", "cost": 0 },
+    { "text": "The first decoded word is 'the'.", "cost": 20 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{plaintext_with_underscores}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

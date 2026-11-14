@@ -1,0 +1,17 @@
+{
+  "id": "HC-013",
+  "title": "Encoded Artifact",
+  "description": "A fictional memory artifact was exported during an authorized forensics lab:\n\n```\nSEN7Zm9yZW5zaWNzX2FydGlmYWN0XzQyfQ==\n```\n\nThe instructor identifies the encoding as Base64 and asks you to recover the embedded artifact.",
+  "objective": "Decode the Base64 string and submit the resulting value as the flag.",
+  "category": "Digital Forensics",
+  "difficulty": "Hard",
+  "xp": 300,
+  "flag": "HC{forensics_artifact_42}",
+  "hints": [
+    { "text": "The decoded text already uses the HC{...} flag format.", "cost": 0 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{...}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}

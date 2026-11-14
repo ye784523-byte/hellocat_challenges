@@ -1,0 +1,18 @@
+{
+  "id": "HC-012",
+  "title": "Duplicate Gateway",
+  "description": "A fictional lab IDS recorded repeated ARP claims on the internal network:\n\n```\n02:14:01 arp who-has 10.20.0.1 tell 10.20.0.66\n02:14:01 arp reply 10.20.0.1 is-at de:ad:be:ef:00:66\n02:14:04 arp reply 10.20.0.1 is-at de:ad:be:ef:00:66\n02:14:09 arp reply 10.20.0.1 is-at de:ad:be:ef:00:66\n```\n\nThe real gateway is 10.20.0.1 with MAC 00:11:22:33:44:55. A lab host is claiming the gateway address.",
+  "objective": "Submit the source IP of the impersonating host as HC{ip}.",
+  "category": "Networking",
+  "difficulty": "Hard",
+  "xp": 300,
+  "flag": "HC{10.20.0.66}",
+  "hints": [
+    { "text": "Look at the 'tell' address in the who-has request and the suspicious replies.", "cost": 0 },
+    { "text": "The attacker is not the real gateway address.", "cost": 50 }
+  ],
+  "maxAttempts": 5,
+  "flagFormat": "HC{ip}",
+  "authorName": "Hello Cat Intel",
+  "published": true
+}
