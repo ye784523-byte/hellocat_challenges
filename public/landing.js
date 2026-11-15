@@ -1,142 +1,22 @@
 /*
  * Hello Cat — official landing page.
  *
- * Three pieces of theatre and three pieces of substance:
- *   - the rain behind the page,
- *   - the decode effect on the headings,
- *   - the boot overlay,
- *   - the live range counters,
- *   - the terminal mock,
- *   - the mobile navigation.
+ * The page is built for the phone first: a sticky header, a sticky dock with
+ * the two calls to action, one column of content and a grid of targets.
+ *
+ * What this script does:
+ *   - types the terminal demonstration,
+ *   - decodes the headings when they scroll into view,
+ *   - reveals the sections,
+ *   - reads the live range counters,
+ *   - opens and closes the mobile navigation,
+ *   - shows the mobile dock only when it is useful.
  */
 
 (() => {
   'use strict';
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ------------------------------------------------------------------ boot */
-
-  const boot = document.getElementById('boot');
-  const bootStatus = document.getElementById('boot-status');
-
-  if (boot) {
-    if (reduceMotion) {
-      boot.classList.add('boot--done');
-    } else {
-      const lines = [
-        'Establishing a secure channel…',
-        'Handshaking with the rabbit hole…',
-        'Range online. Welcome, operator.',
-      ];
-      let step = 0;
-      const timer = setInterval(() => {
-        step += 1;
-        if (step < lines.length) {
-          if (bootStatus) bootStatus.textContent = lines[step];
-          return;
-        }
-        clearInterval(timer);
-        boot.classList.add('boot--done');
-      }, 380);
-      // The overlay also fades on its own, so a blocked timer cannot trap the
-      // visitor behind it.
-      setTimeout(() => boot.classList.add('boot--done'), 2600);
-    }
-  }
-
-  /* ------------------------------------------------------------------ rain */
-
-  const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&@*+=<>/\\|[]{}アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン';
-
-  function startRain() {
-    const canvas = document.getElementById('rain');
-    if (!canvas || reduceMotion) return;
-
-    const context = canvas.getContext('2d', { alpha: false });
-    if (!context) return;
-
-    const fontSize = 15;
-    let columns = 0;
-    let drops = [];
-    let width = 0;
-    let height = 0;
-
-    function resize() {
-      const ratio = Math.min(window.devicePixelRatio || 1, 2);
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = Math.floor(width * ratio);
-      canvas.height = Math.floor(height * ratio);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      context.font = `${fontSize}px "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace`;
-
-      columns = Math.ceil(width / fontSize);
-      drops = Array.from({ length: columns }, () => ({
-        y: Math.random() * -60,
-        speed: 0.5 + Math.random() * 1.4,
-        length: 6 + Math.floor(Math.random() * 12),
-      }));
-      context.fillStyle = '#070a08';
-      context.fillRect(0, 0, width, height);
-    }
-
-    let last = performance.now();
-    let lastDraw = 0;
-
-    function frame(now) {
-      // The rain is drawn at 30 frames per second: the glyphs are a backdrop,
-      // not an animation, and the phone battery is worth more than the extra
-      // frames.
-      if (now - lastDraw < 33) {
-        requestAnimationFrame(frame);
-        return;
-      }
-
-      const delta = Math.min(now - last, 64);
-      last = now;
-      lastDraw = now;
-
-      // The trail is the fade itself: a translucent wash over the last frame.
-      context.fillStyle = 'rgba(7, 10, 8, 0.09)';
-      context.fillRect(0, 0, width, height);
-
-      for (let index = 0; index < columns; index += 1) {
-        const drop = drops[index];
-        const x = index * fontSize;
-        const head = Math.floor(drop.y / fontSize);
-
-        for (let offset = 0; offset < drop.length; offset += 1) {
-          const row = head - offset;
-          if (row < 0 || row * fontSize > height) continue;
-          const glyph = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
-          context.fillStyle = offset === 0 ? 'rgba(190, 255, 222, 0.95)' : 'rgba(0, 255, 136, 0.42)';
-          context.fillText(glyph, x, row * fontSize + fontSize);
-        }
-
-        drop.y += drop.speed * (delta / 16.67);
-        if (drop.y - drop.length * fontSize > height) {
-          drop.y = Math.random() * -20;
-          drop.speed = 0.5 + Math.random() * 1.4;
-          drop.length = 6 + Math.floor(Math.random() * 12);
-        }
-      }
-
-      requestAnimationFrame(frame);
-    }
-
-    resize();
-    window.addEventListener('resize', resize, { passive: true });
-
-    const pause = () => {
-      if (document.hidden) last = performance.now();
-    };
-    document.addEventListener('visibilitychange', pause);
-
-    requestAnimationFrame(frame);
-  }
 
   /* ---------------------------------------------------------------- decode */
 
@@ -155,7 +35,7 @@
 
   /**
    * Scrambles the text of an element and settles it letter by letter, the way
-   * a matrix decoder locks on. Child elements (`<br>`) are left alone.
+   * a decoder locks on. Child elements (`<br>`) are left alone.
    */
   function decode(element) {
     const nodes = textNodesOf(element).filter((node) => node.data.trim().length > 0);
@@ -220,7 +100,7 @@
 
   const MOCK_SCRIPT = [
     [{ text: 'analyst@kali-lab:~$', cls: 'mock__prompt' }, { text: ' challenges' }],
-    [{ text: '[+] catalogue loaded', cls: 'mock__dim' }],
+    [{ text: '[+] catalogue loaded · 4 difficulties · 8 domains', cls: 'mock__dim' }],
     [{ text: 'HC-001  System Whisper        LINUX   EASY', cls: 'mock__dim' }],
     [{ text: 'HC-003  Robots Never Lie      WEB     EASY', cls: 'mock__dim' }],
     [{ text: 'HC-013  Encoded Artifact      FOREN   HARD', cls: 'mock__dim' }],
@@ -337,7 +217,7 @@
     }
   }
 
-  /* ------------------------------------------------------------ mobile nav */
+  /* ----------------------------------------------------------- mobile nav */
 
   function startNavigation() {
     const toggle = document.getElementById('menu-toggle');
@@ -347,12 +227,54 @@
     toggle.addEventListener('click', () => {
       const open = nav.classList.toggle('nav--open');
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.body.classList.toggle('nav-open', open);
     });
 
     nav.addEventListener('click', (event) => {
       if (event.target.tagName !== 'A') return;
       nav.classList.remove('nav--open');
       toggle.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('nav-open');
+    });
+  }
+
+  /* -------------------------------------------------------------- the dock */
+
+  /**
+   * The dock repeats the two calls to action at the bottom of the screen.
+   * It is only useful once the header actions have scrolled away, and it is
+   * in the way when the closing panel already shows the same two buttons.
+   */
+  function startDock() {
+    const dock = document.getElementById('dock');
+    const hero = document.getElementById('hero');
+    const closing = document.querySelector('.closing');
+    if (!dock || !hero) return;
+
+    let pastHero = false;
+    let atClosing = false;
+
+    const paint = () => {
+      const visible = pastHero && !atClosing;
+      dock.classList.toggle('dock--visible', visible);
+    };
+
+    const observe = (element, handler) => {
+      if (!element || !('IntersectionObserver' in window)) return;
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) handler(entry.isIntersecting);
+      });
+      observer.observe(element);
+    };
+
+    observe(hero, (isIntersecting) => {
+      pastHero = !isIntersecting;
+      paint();
+    });
+
+    observe(closing, (isIntersecting) => {
+      atClosing = isIntersecting;
+      paint();
     });
   }
 
@@ -363,12 +285,12 @@
     if (node) node.textContent = String(new Date().getFullYear());
   }
 
-  /* ----------------------------------------------------------------- boot */
+  /* ----------------------------------------------------------------- init */
 
-  startRain();
   renderMock(document.getElementById('mock'));
   startReveals();
   startNavigation();
+  startDock();
   setYear();
   loadStats();
 

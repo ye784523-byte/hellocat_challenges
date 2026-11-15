@@ -152,6 +152,25 @@ Both need the same `FLAG_SECRET`.
 
 ## Quick start
 
+### One command
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ye784523-byte/hellocat_challenges/main/install.sh | bash
+```
+
+The installer checks Node.js, fetches the application, installs the
+dependencies and writes a `.env` with generated secrets. It never overwrites
+an existing `.env`.
+
+### From a checkout
+
+```bash
+git clone https://github.com/ye784523-byte/hellocat_challenges.git
+cd hellocat_challenges
+./install.sh                       # local install
+./install.sh --url https://terminal.example.com
+```
+
 ```bash
 # 1. Configure
 cp .env.example .env
@@ -197,11 +216,18 @@ definition replaces the stored one.
 
 ## The landing page
 
-`public/landing.html` is the front door of the project: a Matrix-style page
-that explains what Hello Cat is, why it exists and how to join.
+`public/landing.html` is the front door of the project: a dark range board that
+explains what Hello Cat is, why it exists and how to join.
 
 - **Public.** No session, no redirect — the visitor reads the site before they
   decide to sign in.
+- **Two calls to action.** **JOIN HELLO CAT** opens the Discord invite,
+  **CONNECT 2 TERMINAL** opens the terminal application. They are in the
+  header, in the hero, in the closing panel and in the dock at the bottom of a
+  phone screen.
+- **Built for the phone first.** The layout is one column on a small screen and
+  widens from there. On a phone the dock keeps both actions one thumb away, and
+  it slides away when the closing panel shows the same two buttons.
 - **Discord only.** The invite is the primary call to action and the page
   states in plain words that Discord is the only supported platform: there is no
   other client to download and no account to create elsewhere.
@@ -212,6 +238,9 @@ that explains what Hello Cat is, why it exists and how to join.
 - **Live counters.** `GET /api/public/stats` returns the number of published
   targets per category and per difficulty. It carries counts only — never a
   title, a description or a flag.
+- **Motion is optional.** The headings decode, the terminal demonstration types
+  itself and the sections fade in — unless the visitor asked for reduced
+  motion, in which case everything is simply there.
 
 The page is a template. The server replaces four placeholders before it is
 sent:
@@ -228,11 +257,8 @@ The three files are:
 | File | Responsibility |
 | --- | --- |
 | `public/landing.html` | the markup |
-| `public/landing.css` | the theme, shared with the terminal palette |
-| `public/landing.js` | the rain, the decode effect, the counters, the mobile menu |
-
-Everything decorative respects `prefers-reduced-motion`: the rain, the boot
-overlay and the reveals are replaced by the final state.
+| `public/landing.css` | the theme: near-black canvas, lime accent, one-pixel borders, background grid |
+| `public/landing.js` | the decode effect, the typed demonstration, the counters, the mobile menu and the dock |
 
 ### The application
 
@@ -321,19 +347,49 @@ repository.
 
 ## Deployment
 
-### Ubuntu server
+### The installer
 
 ```bash
-sudo bash deploy/install-web.sh
+sudo ./install.sh --server --url https://terminal.example.com \
+  --data-dir /opt/hellocat-bot/src/storage/data
 ```
 
-The script installs Node.js 22+, creates a locked-down `hellocat` system user,
-copies the project to `/opt/hellocat-web`, installs
-`deploy/hellocat-web.service` and starts the service.
+| Option | Effect |
+| --- | --- |
+| `--server` | install the systemd unit and (optionally) the nginx site |
+| `--uninstall` | remove the service and the nginx site, keep the data |
+| `--dir <path>` | where the application lives (default `/opt/hellocat-web`) |
+| `--user <name>` | system user for the service (default `hellocat`) |
+| `--port <number>` | port to listen on (default `8080`) |
+| `--url <url>` | public address of the site |
+| `--data-dir <path>` | shared JSON store with the Discord bot |
+| `--no-nginx` / `--nginx` | skip or force the reverse proxy |
+| `--yes` | do not ask any question |
 
-Then put nginx in front of it:
+The installer:
+
+1. installs Node.js 22+ when it is missing (NodeSource on Debian/Ubuntu, `pkg`
+   on Termux, Homebrew on macOS);
+2. creates a locked-down `hellocat` system user;
+3. copies the application to `/opt/hellocat-web`;
+4. writes `.env` with **generated** `FLAG_SECRET` and `SESSION_SECRET` — an
+   existing `.env` is never touched;
+5. installs `deploy/hellocat-web.service` and starts it;
+6. installs `deploy/nginx/hellocat-web.conf` and reloads nginx.
+
+### Ubuntu server, by hand
+
+The installer covers the whole flow. To do it step by step instead:
 
 ```bash
+sudo useradd --system --create-home --home-dir /home/hellocat --shell /usr/sbin/nologin hellocat
+sudo mkdir -p /opt/hellocat-web
+sudo cp -r src lib public labs challenges index.js server.js package.json package-lock.json /opt/hellocat-web/
+cd /opt/hellocat-web && sudo npm ci --omit=dev
+sudo cp deploy/hellocat-web.service /etc/systemd/system/hellocat-web.service
+sudo systemctl daemon-reload && sudo systemctl enable --now hellocat-web
+
+# nginx in front of it
 sudo cp deploy/nginx/hellocat-web.conf /etc/nginx/sites-available/hellocat-web
 sudo ln -s /etc/nginx/sites-available/hellocat-web /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
@@ -548,6 +604,7 @@ access.
 
 ```text
 hellocat_challenges/
+├── install.sh               # the installer: local, --server, --uninstall
 ├── index.js                 # entry point: config, startup probe, shutdown
 ├── server.js                # HTTP server: routing, auth gate, JSON API, SSE
 ├── lib/                     # shell, vfs, basefs, labs, python, auth, session, proxy
@@ -557,7 +614,7 @@ hellocat_challenges/
 ├── challenges/              # the challenge catalogue (easy/ medium/ hard/ expert/)
 ├── src/                     # the bot's storage, services and utils, vendored
 ├── tests/                   # node:test suites
-├── deploy/                  # systemd unit, install script, nginx template
+├── deploy/                  # systemd unit, nginx template
 ├── .env.example
 ├── package.json
 └── README.md

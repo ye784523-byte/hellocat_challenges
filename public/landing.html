@@ -4,24 +4,24 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
-    <title>Hello Cat — Cybersecurity CTF Range &amp; Hands-On Training</title>
+    <title>Hello Cat — Official Cybersecurity Range &amp; Hands-On Training</title>
     <meta
       name="description"
       content="Hello Cat is a hands-on cybersecurity range that lives inside Discord: pick a target, work a fictional lab from a real-looking terminal, capture the flag and climb eight ranks. Discord is the only supported platform."
     />
-    <meta name="theme-color" content="#070a08" />
+    <meta name="theme-color" content="#0b0d0c" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="{{SITE_URL}}" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Hello Cat" />
-    <meta property="og:title" content="Hello Cat — Security Operations Terminal" />
+    <meta property="og:title" content="Hello Cat — Security Operations Range" />
     <meta
       property="og:description"
       content="A hands-on cybersecurity range inside Discord. Fictional labs, real skills, zero risk."
     />
     <meta property="og:url" content="{{SITE_URL}}" />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Hello Cat — Security Operations Terminal" />
+    <meta name="twitter:title" content="Hello Cat — Security Operations Range" />
     <meta
       name="twitter:description"
       content="A hands-on cybersecurity range inside Discord. Fictional labs, real skills, zero risk."
@@ -38,32 +38,30 @@
     </noscript>
     <link
       rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23070a08'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle' fill='%2300ff88' font-family='monospace'%3E%E2%98%80%3C/text%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230b0d0c'/%3E%3Cpath d='M8 10l8 4 8-4v10l-8 4-8-4z' fill='none' stroke='%239ee15d' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E"
     />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
 
-    <canvas class="rain" id="rain" aria-hidden="true"></canvas>
-    <div class="scanlines" aria-hidden="true"></div>
-    <div class="vignette" aria-hidden="true"></div>
-
-    <div class="boot" id="boot" aria-hidden="true">
-      <pre class="boot__logo">   ▄▄▄▄▄▄   ▄▄▄▄▄▄▄▄▄▄
-  ██▀▀▀██  ██▀▀▀██  ██▀▀▀██
-  ██    ██ ██    ██ ██    ██
-  ██▄▄▄██  ██▄▄▄██  ██▄▄▄██
-   ▀▀▀▀▀▀   ▀▀▀▀▀▀▀▀▀▀</pre>
-      <p class="boot__status" id="boot-status">Establishing a secure channel…</p>
+    <div class="backdrop" aria-hidden="true">
+      <div class="backdrop__grid"></div>
+      <div class="backdrop__glow"></div>
     </div>
 
     <header class="topbar">
       <div class="topbar__inner">
         <a class="brand" href="/" aria-label="Hello Cat, home">
-          <span class="brand__mark" aria-hidden="true">◉</span>
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" role="presentation" focusable="false">
+              <path d="M6 9l10 5 10-5v12l-10 5-10-5z" />
+              <path d="M6 9l10 5 10-5" />
+              <path d="M16 14v12" />
+            </svg>
+          </span>
           <span class="brand__text">
             <span class="brand__name">HELLO CAT</span>
-            <span class="brand__tag">SECURITY OPERATIONS TERMINAL</span>
+            <span class="brand__tag">SECURITY OPERATIONS RANGE</span>
           </span>
         </a>
 
@@ -76,9 +74,9 @@
         </nav>
 
         <div class="topbar__actions">
-          <a class="btn btn--ghost" href="{{TERMINAL_URL}}">OPEN TERMINAL</a>
-          <a class="btn btn--primary" href="{{DISCORD_INVITE_URL}}" rel="noopener" target="_blank">
-            JOIN DISCORD
+          <a class="btn btn--ghost btn--sm" href="{{TERMINAL_URL}}">CONNECT 2 TERMINAL</a>
+          <a class="btn btn--primary btn--sm" href="{{DISCORD_INVITE_URL}}" rel="noopener" target="_blank">
+            JOIN HELLO CAT
           </a>
           <button
             class="iconbtn"
@@ -88,7 +86,7 @@
             aria-expanded="false"
             aria-controls="nav"
           >
-            ☰
+            <span aria-hidden="true">☰</span>
           </button>
         </div>
       </div>
@@ -99,19 +97,19 @@
       <section class="hero" id="hero">
         <div class="hero__inner">
           <div class="hero__copy">
-            <p class="eyebrow" data-decode>[ HELLO CAT // SECURITY OPERATIONS TERMINAL ]</p>
-            <h1 class="hero__title" data-decode>TRAIN LIKE AN OPERATOR,<br />NOT A BYSTANDER.</h1>
+            <p class="eyebrow" data-decode>[ HELLOCAT // OFFICIAL RANGE ]</p>
+            <h1 class="hero__title" data-decode>PICK A TARGET.<br />CAPTURE THE FLAG.<br />CLIMB THE RANKS.</h1>
             <p class="hero__lead">
-              Hello Cat is a hands-on security range that lives inside Discord. Pick a target, work a
-              fictional lab from a terminal that behaves like the real thing, capture the flag and
-              climb eight ranks — without touching a single real system.
+              Hello Cat is a hands-on security range that lives inside Discord. Enumerate a fictional
+              box, work a terminal that behaves like the real thing, capture the flag and climb
+              eight ranks — without touching a single real system.
             </p>
 
             <div class="hero__actions">
               <a class="btn btn--primary btn--lg" href="{{DISCORD_INVITE_URL}}" rel="noopener" target="_blank">
-                JOIN THE DISCORD SERVER
+                JOIN HELLO CAT
               </a>
-              <a class="btn btn--ghost btn--lg" href="{{TERMINAL_URL}}">OPEN THE WEB TERMINAL</a>
+              <a class="btn btn--ghost btn--lg" href="{{TERMINAL_URL}}">CONNECT 2 TERMINAL</a>
             </div>
 
             <p class="hero__note">
@@ -140,14 +138,20 @@
           </div>
 
           <div class="hero__stage">
-            <div class="mock" aria-hidden="true">
-              <div class="mock__bar">
-                <span class="mock__dots"><i></i><i></i><i></i></span>
-                <span class="mock__title">analyst@kali-lab — /home/analyst</span>
+            <div class="machine" aria-hidden="true">
+              <div class="machine__bar">
+                <span class="machine__tag">TARGET</span>
+                <span class="machine__title">analyst@kali-lab — /home/analyst</span>
               </div>
-              <pre class="mock__body" id="mock"></pre>
+              <pre class="machine__body" id="mock"></pre>
+              <div class="machine__foot">
+                <span class="chip chip--easy">EASY</span>
+                <span class="chip chip--medium">MEDIUM</span>
+                <span class="chip chip--hard">HARD</span>
+                <span class="chip chip--expert">EXPERT</span>
+              </div>
             </div>
-            <p class="mock__caption">
+            <p class="machine__caption">
               The web terminal is a simulator: <code>rm -rf /</code> can only destroy the session's own
               sandbox, because no host command ever executes.
             </p>
@@ -155,8 +159,72 @@
         </div>
       </section>
 
+      <!-- ------------------------------------------------------------ steps -->
+      <section class="section" id="join">
+        <div class="section__head">
+          <p class="eyebrow" data-decode>// GET STARTED</p>
+          <h2 class="section__title" data-decode>THREE STEPS. THEN YOU'RE IN.</h2>
+          <p class="section__lead">
+            The whole loop takes less than five minutes. Join the server, sign in to the terminal
+            and capture your first flag.
+          </p>
+        </div>
+
+        <ol class="steps">
+          <li class="step reveal">
+            <p class="step__index">01</p>
+            <h3 class="step__title">JOIN HELLO CAT</h3>
+            <p class="step__text">
+              One click on the invite. The bot is already in the server, waiting to post the
+              briefings, the daily operation and the leaderboard.
+            </p>
+            <p class="step__action">
+              <a class="btn btn--primary" href="{{DISCORD_INVITE_URL}}" rel="noopener" target="_blank">
+                JOIN HELLO CAT
+              </a>
+            </p>
+          </li>
+
+          <li class="step reveal">
+            <p class="step__index">02</p>
+            <h3 class="step__title">CONNECT 2 TERMINAL</h3>
+            <p class="step__text">
+              Sign in with Discord and you land in <code>analyst@kali-lab:~$</code>. No
+              registration, no second account, nothing to install.
+            </p>
+            <p class="step__action">
+              <a class="btn btn--ghost" href="{{TERMINAL_URL}}">CONNECT 2 TERMINAL</a>
+            </p>
+          </li>
+
+          <li class="step reveal">
+            <p class="step__index">03</p>
+            <h3 class="step__title">PICK A TARGET, CAPTURE THE FLAG</h3>
+            <p class="step__text">
+              Browse the catalogue, load the lab, investigate and submit the flag. The channel
+              celebrates the capture and your rank moves up.
+            </p>
+          </li>
+        </ol>
+
+        <div class="notice reveal">
+          <p class="notice__kicker">PLATFORM POLICY</p>
+          <p class="notice__title">DISCORD IS THE ONLY SUPPORTED PLATFORM.</p>
+          <p class="notice__text">
+            There is no mobile app, no desktop client and no account to create outside Discord.
+            Your Discord user id is your operator id, so your progress in the channel and your
+            progress in the terminal are the same progress.
+          </p>
+          <p class="notice__text">
+            <strong>{{SITE_URL}}</strong> is where this site is served. We will never ask for
+            your Discord password, never ask you to run anything on your machine, and never ask
+            for money.
+          </p>
+        </div>
+      </section>
+
       <!-- ------------------------------------------------------------- why -->
-      <section class="section" id="why">
+      <section class="section section--alt" id="why">
         <div class="section__head">
           <p class="eyebrow" data-decode>// WHY HELLO CAT</p>
           <h2 class="section__title" data-decode>THEORY IS NOT A SKILL.</h2>
@@ -210,8 +278,8 @@
             <p class="card__index">05</p>
             <h3 class="card__title">PRACTICE THAT FITS</h3>
             <p class="card__text">
-              One daily operation, four drills (quiz, command reconstruction, terminal puzzle, crypto)
-              and priced or free hints when you are stuck. Ten minutes a day counts.
+              One daily operation, four drills (quiz, command reconstruction, terminal puzzle,
+              crypto) and priced or free hints when you are stuck. Ten minutes a day counts.
             </p>
           </article>
 
@@ -227,7 +295,7 @@
       </section>
 
       <!-- ----------------------------------------------------------- range -->
-      <section class="section section--alt" id="range">
+      <section class="section" id="range">
         <div class="section__head">
           <p class="eyebrow" data-decode>// THE RANGE</p>
           <h2 class="section__title" data-decode>EIGHT DOMAINS. FOUR LEVELS.</h2>
@@ -253,88 +321,23 @@
           <div class="level level--easy reveal">
             <p class="level__name">EASY</p>
             <p class="level__count"><span data-stat="difficulty:Easy">—</span> targets</p>
+            <p class="level__hint">Start here</p>
           </div>
           <div class="level level--medium reveal">
             <p class="level__name">MEDIUM</p>
             <p class="level__count"><span data-stat="difficulty:Medium">—</span> targets</p>
+            <p class="level__hint">Chain them</p>
           </div>
           <div class="level level--hard reveal">
             <p class="level__name">HARD</p>
             <p class="level__count"><span data-stat="difficulty:Hard">—</span> targets</p>
+            <p class="level__hint">Bring patience</p>
           </div>
           <div class="level level--expert reveal">
             <p class="level__name">EXPERT</p>
             <p class="level__count"><span data-stat="difficulty:Expert">—</span> targets</p>
+            <p class="level__hint">Prove it</p>
           </div>
-        </div>
-      </section>
-
-      <!-- ------------------------------------------------------------ join -->
-      <section class="section" id="join">
-        <div class="section__head">
-          <p class="eyebrow" data-decode>// HOW TO JOIN</p>
-          <h2 class="section__title" data-decode>FOUR STEPS. THEN YOU'RE IN.</h2>
-        </div>
-
-        <div class="join">
-          <div class="join__notice">
-            <p class="join__notice-kicker">PLATFORM POLICY</p>
-            <p class="join__notice-title">DISCORD IS THE ONLY SUPPORTED PLATFORM.</p>
-            <p class="join__notice-text">
-              There is no mobile app, no desktop client and no account to create outside Discord.
-              Your Discord user id is your operator id, so your progress in the channel and your
-              progress in the terminal are the same progress.
-            </p>
-            <p class="join__notice-text">
-              <strong>{{SITE_URL}}</strong> is where this site is served. We will never ask for
-              your Discord password, never ask you to run anything on your machine, and never ask
-              for money.
-            </p>
-          </div>
-
-          <ol class="steps">
-            <li class="step reveal">
-              <p class="step__index">01</p>
-              <h3 class="step__title">OPEN DISCORD</h3>
-              <p class="step__text">
-                Discord is where the bot lives, where the briefings are posted and where your
-                progress is announced. A free account is all you need.
-              </p>
-            </li>
-            <li class="step reveal">
-              <p class="step__index">02</p>
-              <h3 class="step__title">JOIN THE SERVER</h3>
-              <p class="step__text">
-                Use the invite link below. The bot posts every new target, the daily operation and
-                the weekly leaderboard in the challenge channel.
-              </p>
-              <p class="step__action">
-                <a class="btn btn--primary" href="{{DISCORD_INVITE_URL}}" rel="noopener" target="_blank">
-                  JOIN THE DISCORD SERVER
-                </a>
-              </p>
-            </li>
-            <li class="step reveal">
-              <p class="step__index">03</p>
-              <h3 class="step__title">TAKE THE BRIEFING</h3>
-              <p class="step__text">
-                The bot greets you with a private briefing: how the loop works, where the hints
-                live and which target to start with. Ask it for a route map any time.
-              </p>
-            </li>
-            <li class="step reveal">
-              <p class="step__index">04</p>
-              <h3 class="step__title">PICK A TARGET, CAPTURE THE FLAG</h3>
-              <p class="step__text">
-                Browse the board in the channel, open the web terminal, sign in with Discord and
-                load the lab. Flags are submitted in the terminal; the channel celebrates the
-                capture.
-              </p>
-              <p class="step__action">
-                <a class="btn btn--ghost" href="{{TERMINAL_URL}}">OPEN THE WEB TERMINAL</a>
-              </p>
-            </li>
-          </ol>
         </div>
       </section>
 
@@ -361,7 +364,7 @@
           </div>
           <div class="feature reveal">
             <p class="feature__mark" aria-hidden="true">/</p>
-            <h3 class="feature__title">LAB PER CHALLENGE</h3>
+            <h3 class="feature__title">A LAB PER TARGET</h3>
             <p class="feature__text">
               Each target loads its own environment: the artefacts, logs and services you need are
               already on the simulated host.
@@ -387,7 +390,7 @@
         </div>
 
         <p class="terminal-cta reveal">
-          <a class="btn btn--primary btn--lg" href="{{TERMINAL_URL}}">SIGN IN AND OPEN THE TERMINAL</a>
+          <a class="btn btn--primary btn--lg" href="{{TERMINAL_URL}}">CONNECT 2 TERMINAL</a>
           <span class="terminal-cta-note">Discord sign-in. No separate registration.</span>
         </p>
       </section>
@@ -433,6 +436,14 @@
             </p>
           </details>
           <details class="qa reveal">
+            <summary class="qa__q">Can I use my phone?</summary>
+            <p class="qa__a">
+              Yes. The terminal is a web application, so it adapts to the screen: the keyboard
+              shortcuts are optional and every command can be typed with the on-screen keyboard.
+              The two call-to-action buttons stay within reach at the bottom of the screen.
+            </p>
+          </details>
+          <details class="qa reveal">
             <summary class="qa__q">What are CATCOINS?</summary>
             <p class="qa__a">
               Cosmetic points earned by capturing flags, finishing daily operations and playing the
@@ -453,18 +464,16 @@
 
       <!-- ---------------------------------------------------------- closing -->
       <section class="closing">
-        <pre class="closing__logo" aria-hidden="true">   ▄▄▄▄▄▄   ▄▄▄▄▄▄▄▄▄▄
-  ██▀▀▀██  ██▀▀▀██  ██▀▀▀██
-  ██    ██ ██    ██ ██    ██
-  ██▄▄▄██  ██▄▄▄██  ██▄▄▄██
-   ▀▀▀▀▀▀   ▀▀▀▀▀▀▀▀▀▀</pre>
-        <p class="closing__line" data-decode>THE WHITE RABBIT LEFT A TRAIL. THE BLACK CAT READS IT.</p>
-        <p class="closing__actions">
-          <a class="btn btn--primary btn--lg" href="{{DISCORD_INVITE_URL}}" rel="noopener" target="_blank">
-            JOIN THE DISCORD SERVER
-          </a>
-          <a class="btn btn--ghost btn--lg" href="{{TERMINAL_URL}}">OPEN THE WEB TERMINAL</a>
-        </p>
+        <div class="closing__inner">
+          <p class="closing__kicker" data-decode>// READY?</p>
+          <p class="closing__line" data-decode>THE WHITE RABBIT LEFT A TRAIL. THE BLACK CAT READS IT.</p>
+          <p class="closing__actions">
+            <a class="btn btn--primary btn--lg" href="{{DISCORD_INVITE_URL}}" rel="noopener" target="_blank">
+              JOIN HELLO CAT
+            </a>
+            <a class="btn btn--ghost btn--lg" href="{{TERMINAL_URL}}">CONNECT 2 TERMINAL</a>
+          </p>
+        </div>
       </section>
     </main>
 
@@ -507,6 +516,14 @@
         Authorized training only. Not affiliated with Discord Inc.
       </p>
     </footer>
+
+    <!-- The two actions stay reachable on a phone without scrolling back up. -->
+    <div class="dock" id="dock">
+      <a class="btn btn--ghost" href="{{TERMINAL_URL}}">CONNECT 2 TERMINAL</a>
+      <a class="btn btn--primary" href="{{DISCORD_INVITE_URL}}" rel="noopener" target="_blank">
+        JOIN HELLO CAT
+      </a>
+    </div>
 
     <script src="/landing.js"></script>
   </body>
