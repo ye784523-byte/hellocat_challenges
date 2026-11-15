@@ -1,9 +1,16 @@
-<<<<<<< HEAD
 # Hello Cat — Web Terminal
 
-A browser-based terminal that mimics a Kali Linux workstation, used to solve the
-Hello Cat challenges. It shares the challenge catalogue and the flag store with
-the Discord bot, so progress earned in either place is the same progress.
+[![Node](https://img.shields.io/badge/node-%3E%3D22-5FA04E)](https://nodejs.org)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Website](https://img.shields.io/badge/site-helloc.at-0f0f0f)](https://helloc.at)
+[![Discord](https://img.shields.io/badge/discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/hellocat)
+
+**The browser-based CTF lab of the Hello Cat project.**
+
+A terminal that mimics a Kali Linux workstation, used to solve the Hello Cat
+challenges. It shares the challenge catalogue, the flag store and the operator
+identity with the Discord bot, so progress earned in either place is the same
+progress.
 
 The same process also serves the landing page — the official site at
 `https://helloc.at` — in front of the application.
@@ -18,6 +25,162 @@ The same process also serves the landing page — the official site at
 └──────────────────────────────────────────────────────────────┘
 ```
 
+---
+
+## Table of contents
+
+- [The two repositories](#the-two-repositories)
+- [How the terminal connects to the Discord bot](#how-the-terminal-connects-to-the-discord-bot)
+- [Quick start](#quick-start)
+- [Routes](#routes)
+- [The landing page](#the-landing-page)
+- [Design](#design)
+- [Configuration](#configuration)
+- [Discord application setup](#discord-application-setup)
+- [Deployment](#deployment)
+- [Using the terminal](#using-the-terminal)
+- [API](#api)
+- [Adding a lab](#adding-a-lab)
+- [Testing](#testing)
+- [Security notes](#security-notes)
+- [Project structure](#project-structure)
+- [License](#license)
+
+---
+
+## The two repositories
+
+| Repository | What it is |
+| --- | --- |
+| **[hellocat-bot](https://github.com/ye784523-byte/hellocat-bot)** | The Discord bot: the channel assistant, the command surface, the progression and economy systems, the moderation and admin tooling, and the challenge catalogue. |
+| **[hellocat_challenges](https://github.com/ye784523-byte/hellocat_challenges)** *(this repo)* | The web terminal: the browser-based Kali-style lab where operators solve the challenges, plus the public landing page. |
+
+Both repositories ship the same challenge catalogue (`challenges/`, 17
+educational targets) and the same service layer (`src/storage`, `src/services`),
+so a flag solved in the browser is a flag solved in the Discord bot.
+
+---
+
+## How the terminal connects to the Discord bot
+
+The two halves are not wired together over the network. They are wired together
+through **shared state** and a **shared identity**.
+
+### 1. One data store, two processes
+
+Both halves read and write the same JSON files in `DATA_DIR` (default
+`src/storage/data`):
+
+```text
+src/storage/data/
+├── users.json        # XP, ranks, streaks, CATCOINS
+├── challenges.json   # the catalogue and its published state
+├── submissions.json  # attempts and captures
+├── achievements.json
+├── economy.json
+├── settings.json     # announcement watermarks and runtime settings
+├── moderation.json
+└── audit.json
+```
+
+Writes are atomic (temp file → `fsync` → rename) **and** serialised with a
+lock file (`src/utils/fileLock.js`), so the bot and the terminal can run side
+by side without losing each other's updates.
+
+Point the terminal at the bot's directory to share progress:
+
+```dotenv
+DATA_DIR=/opt/hellocat-bot/src/storage/data
+```
+
+If you would rather isolate them, give each side its own `DATA_DIR` — progress
+then has to be synced separately.
+
+### 2. The same code path
+
+This repository vendors the bot's `src/` tree and calls the very same services
+— `challengeService`, `playerService`, `economyService`,
+`achievementService` — against that store. A capture in the browser is not a
+copy of a capture in Discord; it is the same operation.
+
+### 3. The same identity
+
+Operators sign in with **Discord OAuth2** and the Discord user id is the
+operator id. That user id is the key used by `users.json`, so:
+
+- XP, ranks, streaks, achievements and CATCOINS are shared.
+- A solve in the terminal shows up in the bot's `/profile`, `/rank` and
+  `/leaderboard`.
+- `WEB_CLIENT_ID` defaults to `CLIENT_ID`, so one Discord application usually
+  serves both halves. Set it explicitly when the terminal uses a separate
+  application.
+
+### 4. The same flag hashes
+
+Flags are stored as `HMAC-SHA256(FLAG_SECRET, normalised_flag)` in both
+halves. **Both processes must use the same `FLAG_SECRET`**, otherwise the
+terminal computes a different hash than the bot and no submission ever
+verifies.
+
+### 5. The bot announces what the terminal solves
+
+The bot's announcement scheduler polls `submissions.json` and celebrates
+captures that happened in the browser, keeping a watermark in `settings.json`.
+The bot is the narrator; the terminal is the battlefield.
+
+### 6. Deep links in both directions
+
+```text
+bot  ──▶  <WEB_PUBLIC_URL>/terminal?challenge=HC-001      (announcements, hints)
+bot  ──▶  https://discord.gg/<invite>                      (the terminal's call to action)
+bot  ◀──  captures, XP and coins written into the shared store
+```
+
+### Running the two halves together
+
+```bash
+# terminal (this repository, own process)
+npm install && npm start          # http://localhost:8080
+
+# bot (https://github.com/ye784523-byte/hellocat-bot)
+npm install && npm start          # connected to the same DATA_DIR
+```
+
+Both need the same `FLAG_SECRET`.
+
+---
+
+## Quick start
+
+```bash
+# 1. Configure
+cp .env.example .env
+$EDITOR .env          # set CLIENT_ID, DISCORD_CLIENT_SECRET, FLAG_SECRET, SESSION_SECRET
+
+# 2. Install
+npm install
+
+# 3. Start
+npm start             # http://localhost:8080
+```
+
+Open `http://localhost:8080` for the landing page, or
+`http://localhost:8080/terminal` to sign in with Discord and be dropped into
+`analyst@kali-lab:~$`.
+
+The challenge catalogue is imported into the store on every start, so a fresh
+checkout is playable immediately. The import is idempotent: an updated
+definition replaces the stored one.
+
+| Script | What it does |
+| --- | --- |
+| `npm start` | Run the terminal. |
+| `npm run web` | Alias of `npm start`. |
+| `npm test` | Run the test suite. |
+| `npm run lint` | Syntax-check every JavaScript file. |
+
+---
+
 ## Routes
 
 | Route | What it serves |
@@ -30,9 +193,11 @@ The same process also serves the landing page — the official site at
 | `GET /auth/callback` | finishes the handshake and opens `/terminal` |
 | `GET /healthz` | liveness probe |
 
+---
+
 ## The landing page
 
-`web/public/landing.html` is the front door of the project: a Matrix-style page
+`public/landing.html` is the front door of the project: a Matrix-style page
 that explains what Hello Cat is, why it exists and how to join.
 
 - **Public.** No session, no redirect — the visitor reads the site before they
@@ -62,9 +227,9 @@ The three files are:
 
 | File | Responsibility |
 | --- | --- |
-| `web/public/landing.html` | the markup |
-| `web/public/landing.css` | the theme, shared with the terminal palette |
-| `web/public/landing.js` | the rain, the decode effect, the counters, the mobile menu |
+| `public/landing.html` | the markup |
+| `public/landing.css` | the theme, shared with the terminal palette |
+| `public/landing.js` | the rain, the decode effect, the counters, the mobile menu |
 
 Everything decorative respects `prefers-reduced-motion`: the rain, the boot
 overlay and the reveals are replaced by the final state.
@@ -75,6 +240,7 @@ The terminal application itself is unchanged — it lives at `/terminal` now, so
 the landing page can own the root of the domain. Deep links keep working:
 `/terminal?challenge=HC-001` loads a target directly.
 
+---
 
 ## Design
 
@@ -85,58 +251,85 @@ and it means a stray `rm -rf /` can only destroy the session's own sandbox.
 
 | Layer | File | Responsibility |
 | --- | --- | --- |
-| HTTP server | `web/server.js` | routing, auth gate, JSON API, SSE stream |
-| Session | `web/lib/session.js` | per-operator shell, challenge state, flag submission |
-| Shell | `web/lib/shell.js` | tokenizer, pipelines, redirection, globbing, history |
-| Commands | `web/lib/commands/*.js` | ~90 commands across 8 groups |
-| Filesystem | `web/lib/vfs.js` | nodes, permissions, symlinks, path resolution |
-| Image | `web/lib/basefs.js` | the Kali-like baseline tree |
-| Labs | `web/labs/*.json` | one environment per challenge |
-| Interpreter | `web/lib/python.js` | a compact Python subset |
-| Auth | `web/lib/auth.js` | Discord OAuth2 + signed session cookies |
+| HTTP server | `server.js` | routing, auth gate, JSON API, SSE stream |
+| Entry point | `index.js` | configuration, startup probe, graceful shutdown |
+| Session | `lib/session.js` | per-operator shell, challenge state, flag submission |
+| Shell | `lib/shell.js` | tokenizer, pipelines, redirection, globbing, history |
+| Commands | `lib/commands/*.js` | ~90 commands across 8 groups |
+| Filesystem | `lib/vfs.js` | nodes, permissions, symlinks, path resolution |
+| Image | `lib/basefs.js` | the Kali-like baseline tree |
+| Labs | `labs/*.json` | one environment per challenge |
+| Interpreter | `lib/python.js` | a compact Python subset |
+| Auth | `lib/auth.js` | Discord OAuth2 + signed session cookies |
+| Storage | `src/storage/` | the JSON store shared with the Discord bot |
+| Services | `src/services/` | the bot's service layer, called unchanged |
 
 ### Why a hand-written Python?
 
 Three challenges (XOR Gate, White Rabbit Vigenère, Nested Signal) are
 scripting exercises. Without an interpreter the operator has to solve them on
-paper, which teaches nothing about the terminal. `web/lib/python.js` implements
+paper, which teaches nothing about the terminal. `lib/python.js` implements
 variables, control flow, functions, lists, dicts, string methods, f-strings and
 `base64` / `binascii` / `hashlib` / `math` modules — enough to brute-force a
 Vigenère key, but small enough to audit.
 
-## Running locally
+---
 
-```bash
-# 1. Configure
-cp .env.example .env
-$EDITOR .env          # set DISCORD_CLIENT_SECRET, SESSION_SECRET, FLAG_SECRET
+## Configuration
 
-# 2. Start
-npm run web           # http://localhost:8080
-```
+Copy `.env.example` to `.env`. The full annotated template ships with the
+repository.
 
-Open `http://localhost:8080` for the landing page, or
-`http://localhost:8080/terminal` to sign in with Discord and be dropped into
-`analyst@kali-lab:~$`.
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `CLIENT_ID` | Yes | Discord application id. |
+| `DISCORD_CLIENT_SECRET` | Yes | OAuth2 client secret of that application. Never the bot token. |
+| `FLAG_SECRET` | Yes | HMAC key for the flags, at least 16 characters. **Must match the bot.** |
+| `SESSION_SECRET` | No | Signs the session cookie, at least 16 characters. Defaults to `FLAG_SECRET`. |
+| `WEB_CLIENT_ID` | No | OAuth2 client id when the terminal uses a separate application. Defaults to `CLIENT_ID`. |
+| `DATA_DIR` | No | Shared JSON data directory. Default `src/storage/data`. |
+| `LOG_DIR` | No | Log directory. Default `logs`. |
+| `WEB_PORT` | No | Port to bind. Falls back to `PORT`, then `8000`. |
+| `WEB_HOST` | No | Bind address. Default `0.0.0.0`. |
+| `WEB_BASE_URL` | Prod | Public address of the site. The root serves the landing page, `/terminal` the application. |
+| `WEB_REDIRECT_URI` | Prod | OAuth2 redirect URI. Defaults to `WEB_BASE_URL + /auth/callback`, or the request host when unset. Must match the developer portal byte for byte. |
+| `OFFICIAL_SITE_URL` | No | Official website written on the landing page. Default `https://helloc.at`. |
+| `DISCORD_INVITE_URL` | No | Invite to the Discord server, the primary call to action. Defaults to `https://discord.gg/<GUILD_ID>`. |
+| `WEB_REQUIRE_GUILD` | No | Require Discord server membership before granting access. |
+| `WEB_COOKIE_SECURE` | No | `auto` (default), `true` or `false`. `auto` marks the cookie Secure for HTTPS requests. |
+| `WEB_TRUST_PROXY` | No | Honour `X-Forwarded-Proto` from a loopback proxy. Default `true`. |
+| `WEB_COOKIE_DOMAIN` | No | Cookie domain. Empty (default) keeps the cookie host-only. |
+| `WEB_SESSION_TTL` | No | Session lifetime in seconds. Default `43200` (12 hours). |
+| `GUILD_ID` | No | Guild checked when `WEB_REQUIRE_GUILD=true`. |
+| `DISCORD_TOKEN` | No | Only needed when the terminal posts on its own. The terminal never connects to the gateway. |
 
-### Discord application setup
+**Never commit `.env`.** It is already ignored.
+
+---
+
+## Discord application setup
 
 1. Create an application at <https://discord.com/developers/applications>.
 2. Under **OAuth2 → Redirects**, add `http://localhost:8080/auth/callback`
    (and your production URL).
 3. Copy the client secret into `DISCORD_CLIENT_SECRET`.
 4. The bot's `CLIENT_ID` is reused — one application serves both the bot and
-   the web terminal.
+   the terminal. Set `WEB_CLIENT_ID` when the terminal uses its own
+   application.
 
-## Production on Ubuntu
+---
+
+## Deployment
+
+### Ubuntu server
 
 ```bash
 sudo bash deploy/install-web.sh
 ```
 
 The script installs Node.js 22+, creates a locked-down `hellocat` system user,
-copies the project to `/opt/hellocatbot`, installs `deploy/hellocat-web.service`
-and starts the service.
+copies the project to `/opt/hellocat-web`, installs
+`deploy/hellocat-web.service` and starts the service.
 
 Then put nginx in front of it:
 
@@ -146,14 +339,15 @@ sudo ln -s /etc/nginx/sites-available/hellocat-web /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-Set these in `/opt/hellocatbot/.env` before starting:
+Set these in `/opt/hellocat-web/.env` before starting:
 
 ```ini
 WEB_PORT=8080
-WEB_BASE_URL=https://quarterly-vaguest-milania.ngrok-free.dev
+WEB_BASE_URL=https://terminal.example.com
 WEB_COOKIE_SECURE=true
 OFFICIAL_SITE_URL=https://helloc.at
 DISCORD_INVITE_URL=https://discord.gg/your-invite
+DATA_DIR=/opt/hellocat-bot/src/storage/data
 ```
 
 The nginx configuration disables proxy buffering so the terminal's
@@ -171,13 +365,23 @@ The unit runs as a non-root user with `ProtectSystem=strict` and an explicit
 `ReadWritePaths` list. The terminal does not need write access to anything
 except the shared data folder.
 
-## Sharing storage with the Discord bot
+### PaaS (Railway, Render, Fly)
 
-Both processes read and write `src/storage/data/*.json`. Writes are atomic
-(temp file + rename) and are serialised with a lock file
-(`src/utils/fileLock.js`), so the two processes can run side by side without
-losing each other's updates. If you would rather isolate them, point the web
-terminal at its own `DATA_DIR` — progress then has to be synced separately.
+The application is a plain Node.js service:
+
+| Setting | Value |
+| --- | --- |
+| Build command | `npm ci` |
+| Start command | `npm start` |
+| Port | injected as `PORT`, used when `WEB_PORT` is unset |
+| Health check | `GET /healthz` |
+
+Set `WEB_BASE_URL` to the public address of the deployment and register
+`<WEB_BASE_URL>/auth/callback` as an OAuth2 redirect in the Discord developer
+portal. `DATA_DIR` must point at a **persistent volume** — the progress of the
+operators lives there.
+
+---
 
 ## Using the terminal
 
@@ -195,11 +399,11 @@ Flags can also be submitted from the **SUBMIT FLAG** button above the terminal.
 
 ### Sealed labs
 
-A challenge can require other challenges to be captured first (`prerequisites` in the
-challenge definition). While the gate is closed the terminal refuses to load the
-environment and refuses the flag submission, and the sidebar marks the entry with
-🔒. The gate is evaluated per operator: once the prerequisite is captured, the
-lab opens for that operator only.
+A challenge can require other challenges to be captured first
+(`prerequisites` in the challenge definition). While the gate is closed the
+terminal refuses to load the environment and refuses the flag submission, and
+the sidebar marks the entry with 🔒. The gate is evaluated per operator: once
+the prerequisite is captured, the lab opens for that operator only.
 
 ### Command highlights
 
@@ -235,6 +439,8 @@ Pipelines (`|`), redirection (`>`, `>>`), chaining (`&&`, `||`, `;`), quoting,
 environment variables (`$HOME`), globs (`*.log`), aliases and command history
 all behave the way they do in bash.
 
+---
+
 ## API
 
 | Method | Route | Description |
@@ -254,11 +460,14 @@ all behave the way they do in bash.
 | `GET` | `/api/terminal/events` | server-sent events (solved notifications) |
 | `GET` | `/healthz` | liveness probe |
 
-Every `/api/*` route requires a valid session cookie, except `/api/public/stats`.
+Every `/api/*` route requires a valid session cookie, except
+`/api/public/stats`.
+
+---
 
 ## Adding a lab
 
-Create `web/labs/HC-0XX.json` next to the existing ones:
+Create `labs/HC-0XX.json` next to the existing ones:
 
 ```json
 {
@@ -288,25 +497,36 @@ Create `web/labs/HC-0XX.json` next to the existing ones:
 }
 ```
 
-Then add the matching challenge to `challenges/<difficulty>/` and re-run
-`npm run import -- --publish`. The lab is picked up automatically the next
-time the service starts.
+Then add the matching challenge to `challenges/<difficulty>/`. The catalogue is
+imported into the store on every start, so the lab is available the next time
+the service starts. The import is idempotent.
 
 `files` is mounted as root; specify `owner`, `group`, `uid`, `gid` and `mode`
 to control who can read what. Modes matter — several challenges are about
 permissions, and `ls -l` renders them faithfully.
 
-## Tests
+---
+
+## Testing
 
 ```bash
-npm test                              # whole suite
-node --test tests/web-terminal.test.js
-node --test tests/web-server.test.js
+npm test
+npm run lint
 ```
+
+The suite covers the shell (tokenizer, pipelines, redirection, globbing), the
+in-memory filesystem, the lab environments, the Python subset, the signed
+session tokens and cookies, the OAuth2 gate, the landing page, the fit addon
+and the command catalogue.
 
 `tests/web-terminal.test.js` includes a table that drives every challenge with
 the commands a solver would realistically use and asserts the answer is
 reachable — so a broken lab fails the build rather than puzzling a student.
+
+Tests use temporary directories and never require a Discord token or network
+access.
+
+---
 
 ## Security notes
 
@@ -315,102 +535,39 @@ reachable — so a broken lab fails the build rather than puzzling a student.
   lab's own inventory.
 - Sessions live in memory and expire after two hours of inactivity.
 - The session cookie is `HttpOnly`, `SameSite=Lax` and signed with HMAC-SHA256.
-- Discord bot tokens are never sent to the browser; only `identify` scope is
-  requested.
+- Discord bot tokens are never sent to the browser; only the `identify` scope
+  is requested.
 - Every flag is verified with the same HMAC scheme the Discord bot uses, so
   plaintext flags are never stored in the shared data files.
-=======
-# hcweb
+- The bundled challenges are educational examples. Rotate their flags before
+  using them in a competitive event.
 
+---
 
+## Project structure
 
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
+```text
+hellocat_challenges/
+├── index.js                 # entry point: config, startup probe, shutdown
+├── server.js                # HTTP server: routing, auth gate, JSON API, SSE
+├── lib/                     # shell, vfs, basefs, labs, python, auth, session, proxy
+│   └── commands/            # ~90 commands across 8 groups
+├── public/                  # the terminal application and the landing page
+├── labs/                    # one JSON environment per challenge
+├── challenges/              # the challenge catalogue (easy/ medium/ hard/ expert/)
+├── src/                     # the bot's storage, services and utils, vendored
+├── tests/                   # node:test suites
+├── deploy/                  # systemd unit, install script, nginx template
+├── .env.example
+├── package.json
+└── README.md
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/roothax-group/hcweb.git
-git branch -M main
-git push -uf origin main
-```
 
-## Integrate with your tools
-
-* [Set up project integrations](https://gitlab.com/roothax-group/hcweb/-/settings/integrations)
-
-## Collaborate with your team
-
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+---
 
 ## License
-For open source projects, say how it is licensed.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
->>>>>>> f61b3bba818f02ec3ed3b2ce721144782879cce1
+MIT.
+
+Every challenge is a fictitious educational scenario for authorized lab
+environments. CATCOINS are fictional and have no monetary value.

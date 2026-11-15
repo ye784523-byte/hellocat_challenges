@@ -1,0 +1,40 @@
+[Unit]
+Description=Hello Cat Web Terminal
+Documentation=https://github.com/ye784523-byte/hellocat_challenges
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=hellocat
+Group=hellocat
+WorkingDirectory=/opt/hellocat-web
+EnvironmentFile=/opt/hellocat-web/.env
+ExecStart=/usr/bin/node index.js
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=15
+
+# The terminal only needs to read its own directory and write to its data
+# folder. It never executes host commands.
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=false
+ReadWritePaths=/opt/hellocat-web/src/storage/data /opt/hellocat-web/logs
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=hellocat-web
+
+[Install]
+WantedBy=multi-user.target

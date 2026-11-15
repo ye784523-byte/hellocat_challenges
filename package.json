@@ -11,7 +11,8 @@
   "scripts": {
     "start": "node index.js",
     "web": "node index.js",
-    "lint": "find . -name '*.js' -not -path './node_modules/*' -exec node --check {} \\;"
+    "test": "node --test --test-reporter=spec tests/*.test.js",
+    "lint": "find . -name '*.js' -not -path './node_modules/*' -not -path './public/vendor/*' -exec node --check {} \\;"
   },
   "keywords": [
     "ctf",
