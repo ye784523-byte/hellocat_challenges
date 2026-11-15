@@ -1,9 +1,34 @@
-/* Hello Cat web terminal — client application. */
+/* Hello Cat web terminal — client application.
+   Shows mobile (Android-like) or desktop (Kali Linux clone) UI based on
+   device detection. The chosen layout is persisted in a cookie so a reload
+   keeps the same view. */
 
-(() => {
-  'use strict';
+/**
+ * Returns true if the current device looks like a mobile phone.
+ * Checks user-agent and screen width.
+ */
+function isMobileDevice() {
+  const toLower = (s) => String(s).toLowerCase();
+  const ua = toLower(navigator.userAgent);
+  const isPhone = /phone/.test(ua);
+  const isTablet = /tablet/.test(ua);
+  const width = window.innerWidth || document.documentElement.clientWidth;
+  const isSmallScreen = width < 768;
+  return isPhone || isTablet || isSmallScreen;
+}
 
-  const KALI_THEME = {
+/** Persists the chosen UI mode in a cookie so reloads stay consistent. */
+function setUiMode(mode) {
+  const oneYear = 365 * 24 * 60 * 60 * 1000;
+  document.cookie = `ui_mode=${mode}; Max-Age=${oneYear}; path=/; SameSite=Lax`;
+}
+
+function getUiMode() {
+  const match = document.cookie.match(/(?:^|; )ui_mode=([^;])/);
+  return match ? match[1] : null;
+}
+
+const KALI_THEME = {
     background: '#070a08',
     foreground: '#c9e8d6',
     cursor: '#00ff88',
@@ -143,7 +168,7 @@
     return state.challenges.find((challenge) => challenge.id === state.challengeId) ?? null;
   }
 
-  /** Renders the brief of the loaded challenge in the left panel. */
+  /** Renders the brief of the loaded challenge. */
   function renderInfo() {
     const challenge = activeChallenge();
 
@@ -162,9 +187,16 @@
 
     $('info-id').textContent = challenge.id;
     $('info-title').textContent = challenge.title;
-    $('info-meta').innerHTML = `
-      <span class="${difficultyClass(challenge.difficulty)}">${escapeHtml(challenge.difficulty ?? 'Unknown')}</span>
-      <span class="info__category">${escapeHtml(challenge.category ?? '')}</span>`;
+    // Mobile: show only difficulty; desktop: show difficulty + category
+    const isMobile = $('html').classList.contains('mobile');
+    if (isMobile) {
+      $('info-meta').innerHTML = `
+        <span class="${difficultyClass(challenge.difficulty)}">${escapeHtml(challenge.difficulty ?? 'Unknown')}</span>`;
+    } else {
+      $('info-meta').innerHTML = `
+        <span class="${difficultyClass(challenge.difficulty)}">${escapeHtml(challenge.difficulty ?? 'Unknown')}</span>
+        <span class="info__category">${escapeHtml(challenge.category ?? '')}</span>`;
+    }
 
     $('info-description').textContent =
       challenge.description ?? 'No description for this target yet.';
@@ -202,33 +234,52 @@
 
     $('challenge-count').textContent = String(state.challenges.length);
 
+    const isMobile = $('html').classList.contains('mobile');
+
     if (visible.length === 0) {
       const empty = document.createElement('li');
       empty.className = 'challenge';
       empty.style.cursor = 'default';
-      empty.innerHTML = '<div class="challenge__title" style="color:var(--text-faint)">No challenges match.</div>';
+      if (isMobile) {
+        empty.innerHTML = '<div class="challenge__title" style="color:var(--text-faint)">No challenges match.</div>';
+      } else {
+        empty.innerHTML = '<div class="challenge__title" style="color:var(--text-faint)">No challenges match.</div>';
+      }
       list.appendChild(empty);
       return;
     }
 
     for (const challenge of visible) {
       const item = document.createElement('li');
-      item.className = `challenge${challenge.id === state.challengeId ? ' challenge--active' : ''}${challenge.locked ? ' challenge--locked' : ''}`;
+      const classes = `challenge${challenge.id === state.challengeId ? ' challenge--active' : ''}${challenge.locked ? ' challenge--locked' : ''}`;
+      item.className = classes;
       const gate = challenge.locked
         ? `<span class="challenge__locked" title="Locked: solve ${(challenge.missingPrerequisites ?? []).join(', ')}">🔒</span>`
         : '';
-      item.innerHTML = `
-        <div class="challenge__top">
-          <span class="challenge__id">${challenge.id}</span>
-          ${challenge.solved ? '<span class="challenge__solved">✔</span>' : ''}
-          ${gate}
-        </div>
-        <div class="challenge__title">${escapeHtml(challenge.title)}</div>
-        <div class="challenge__meta">
-          <span class="${difficultyClass(challenge.difficulty)}">${challenge.difficulty}</span>
-          <span>${escapeHtml(challenge.category)}</span>
-          <span>${challenge.xp} XP</span>
-        </div>`;
+      // Mobile: simpler list item; desktop: full meta
+      if (isMobile) {
+        item.innerHTML = `
+          <div class="challenge__top">
+            <span class="challenge__id">${challenge.id}</span>
+            ${challenge.solved ? '<span class="challenge__solved">✔</span>' : ''}
+            ${gate}
+          </div>
+          <div class="challenge__title">${escapeHtml(challenge.title)}</div>
+        `;
+      } else {
+        item.innerHTML = `
+          <div class="challenge__top">
+            <span class="challenge__id">${challenge.id}</span>
+            ${challenge.solved ? '<span class="challenge__solved">✔</span>' : ''}
+            ${gate}
+          </div>
+          <div class="challenge__title">${escapeHtml(challenge.title)}</div>
+          <div class="challenge__meta">
+            <span class="${difficultyClass(challenge.difficulty)}">${challenge.difficulty}</span>
+            <span>${escapeHtml(challenge.category)}</span>
+            <span>${challenge.xp} XP</span>
+          </div>`;
+      }
       item.addEventListener('click', () => startChallenge(challenge.id));
       list.appendChild(item);
     }
@@ -498,8 +549,16 @@
       });
     }
 
+    // Toggle challenge drawer on mobile; on desktop just open/close panel.
+    const isMobile = $('html').classList.contains('mobile');
     $('btn-labs').addEventListener('click', () => {
-      $('panel').classList.toggle('panel--open');
+      if (isMobile) {
+        // On mobile, slide the drawer open/close
+        $('panel').classList.toggle('drawer--open');
+      } else {
+        // On desktop, toggle the side panel
+        $('panel').classList.toggle('panel--open');
+      }
     });
 
     $('btn-hint').addEventListener('click', requestHint);
@@ -526,6 +585,14 @@
   async function boot() {
     const status = $('boot-status');
 
+    // Determine UI mode: mobile or desktop; persist in cookie if not set.
+    let mode = getUiMode();
+    if (!mode) {
+      mode = isMobileDevice() ? 'mobile' : 'desktop';
+      setUiMode(mode);
+    }
+    $('html').classList.add(mode);
+
     try {
       const payload = await api('/api/session');
 
@@ -541,6 +608,13 @@
       setupTerminalInput();
       setupEvents();
       setupPanel();
+
+      // Apply mode-specific classes after the DOM is ready.
+      if (mode === 'mobile') {
+        $('shell').classList.add('shell--mobile');
+      } else {
+        $('shell').classList.add('shell--desktop');
+      }
 
       write(`\x1b[1;32m  ▄▄▄▄▄▄   ▄▄▄▄▄▄▄▄▄▄\x1b[0m\r\n`);
       write(`\x1b[1;32m ██▀▀▀██  ██▀▀▀██  ██▀▀▀██\x1b[0m\r\n`);

@@ -843,3 +843,57 @@ body.autherror {
 .autherror__button:hover {
   background: rgba(0, 255, 136, 0.16);
 }
+
+/* ----------------------------------------------------------------- ui mode */
+
+/* Mobile: challenges drawer slides in from left */
+html.mobile .dock {
+  display: none;
+}
+
+html.mobile #panel {
+  position: fixed;
+  inset: var(--header-h) auto 0 0;
+  width: min(92vw, 420px);
+  z-index: 15;
+  transform: translateX(-100%);
+  transition: transform 0.18s ease;
+  box-shadow: 18px 0 40px rgba(0, 0, 0, 0.6);
+}
+
+html.mobile #panel.panel--open,
+html.mobile #panel.drawer--open {
+  transform: translateX(0);
+}
+
+html.mobile .info {
+  max-height: none;
+}
+
+/* Desktop: classic side-panel layout */
+html.desktop #panel {
+  position: static;
+  transform: none;
+  box-shadow: none;
+}
+
+html.desktop .layout {
+  grid-template-columns: 40% 60%;
+}
+
+html.desktop .info {
+  max-height: 58%;
+}
+
+html.desktop .iconbtn {
+  display: none;
+}
+
+html.desktop .profile__name {
+  display: block;
+}
+
+/* The dock is a phone affordance: hide on desktop */
+html.desktop .dock {
+  display: none;
+}
