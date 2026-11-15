@@ -85,6 +85,97 @@ test('shell reports unknown commands like bash', async () => {
   assert.match(result.stderr, /command not found/);
 });
 
+test('cd changes the working directory for the whole session', async () => {
+  const shell = makeShell();
+
+  assert.equal(shell.cwd, '/home/analyst');
+
+  await shell.run('cd /etc');
+  assert.equal(shell.cwd, '/etc');
+
+  const printed = await shell.run('pwd');
+  assert.equal(printed.stdout.trim(), '/etc');
+
+  // The prompt follows the working directory.
+  assert.match(shell.prompt(), /etc/);
+
+  // A relative path is relative to the new directory.
+  await shell.run('cd ..');
+  assert.equal(shell.cwd, '/');
+});
+
+test('cd understands ~, - and reports errors like bash', async () => {
+  const shell = makeShell();
+
+  await shell.run('cd /etc');
+  const back = await shell.run('cd -');
+  assert.equal(shell.cwd, '/home/analyst');
+  // bash prints the directory it moves to.
+  assert.equal(back.stdout.trim(), '/home/analyst');
+
+  await shell.run('cd /etc');
+  await shell.run('cd ~');
+  assert.equal(shell.cwd, '/home/analyst');
+
+  const missing = await shell.run('cd /definitely-not-here');
+  assert.equal(missing.code, 1);
+  assert.match(missing.stderr, /No such file or directory/);
+  assert.equal(shell.cwd, '/home/analyst');
+
+  const notADirectory = await shell.run('cd /etc/passwd');
+  assert.equal(notADirectory.code, 1);
+  assert.match(notADirectory.stderr, /Not a directory/);
+});
+
+test('the directory stack moves between folders and back', async () => {
+  const shell = makeShell();
+
+  await shell.run('pushd /etc');
+  assert.equal(shell.cwd, '/etc');
+
+  await shell.run('pushd /var');
+  assert.equal(shell.cwd, '/var');
+
+  const listed = await shell.run('dirs');
+  assert.match(listed.stdout, /\/etc/);
+  assert.match(listed.stdout, /\/var/);
+
+  await shell.run('popd');
+  assert.equal(shell.cwd, '/etc');
+
+  await shell.run('popd');
+  assert.equal(shell.cwd, '/home/analyst');
+
+  const empty = await shell.run('popd');
+  assert.equal(empty.code, 1);
+  assert.match(empty.stderr, /stack empty/);
+});
+
+test('the history repeats the last command and can be cleared', async () => {
+  const shell = makeShell();
+
+  await shell.run('echo first');
+  await shell.run('echo second');
+  assert.deepEqual(shell.history, ['echo first', 'echo second']);
+
+  const repeated = await shell.run('!!');
+  assert.equal(repeated.stdout.trim(), 'second');
+
+  const listed = await shell.run('history');
+  assert.match(listed.stdout, /echo first/);
+
+  await shell.run('history -c');
+  assert.equal(shell.history.length, 0);
+});
+
+test('the history is empty when !! has nothing to repeat', async () => {
+  const shell = makeShell();
+  const result = await shell.run('!!');
+
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /event not found/);
+});
+
 test('shell never touches the host filesystem', async () => {
   const shell = makeShell();
   const result = await shell.run('echo "escaped" > /tmp/../../../../tmp/opencode/escape.txt');

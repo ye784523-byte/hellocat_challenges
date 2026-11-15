@@ -221,6 +221,61 @@ test('flag submission is verified and recorded against the shared store', async 
   }
 });
 
+test('the terminal keeps the working directory between commands', async () => {
+  const server = await startServer();
+  try {
+    const cookie = cookieFor('user-6');
+    const exec = async (command) =>
+      (
+        await fetch(`${server.base}/api/terminal/exec`, {
+          method: 'POST',
+          headers: { cookie, 'content-type': 'application/json' },
+          body: JSON.stringify({ command }),
+        })
+      ).json();
+
+    const moved = await exec('cd /etc');
+    assert.equal(moved.code, 0);
+    assert.equal(moved.cwd, '/etc');
+    assert.match(moved.prompt, /etc/);
+
+    const printed = await exec('pwd');
+    assert.equal(printed.stdout.trim(), '/etc');
+
+    // The session API reports the directory too.
+    const session = await (await fetch(`${server.base}/api/session`, { headers: { cookie } })).json();
+    assert.equal(session.cwd, '/etc');
+    assert.ok(Array.isArray(session.directories));
+  } finally {
+    await server.cleanup();
+  }
+});
+
+test('the session keeps the command history across requests', async () => {
+  const server = await startServer();
+  try {
+    const cookie = cookieFor('user-7');
+    const exec = async (command) =>
+      (
+        await fetch(`${server.base}/api/terminal/exec`, {
+          method: 'POST',
+          headers: { cookie, 'content-type': 'application/json' },
+          body: JSON.stringify({ command }),
+        })
+      ).json();
+
+    await exec('echo first-command');
+    await exec('echo second-command');
+
+    const session = await (await fetch(`${server.base}/api/session`, { headers: { cookie } })).json();
+    assert.ok(Array.isArray(session.history));
+    assert.ok(session.history.includes('echo first-command'));
+    assert.ok(session.history.includes('echo second-command'));
+  } finally {
+    await server.cleanup();
+  }
+});
+
 test('challenge catalogue lists the lab challenges', async () => {
   const server = await startServer();
   try {

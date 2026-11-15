@@ -534,6 +534,9 @@ export async function createWebServer({ config, logger }) {
         prompt: session.shell.prompt(),
         progress,
         commands: commandCatalogue(),
+        // The history survives a reload, so the arrow keys keep working.
+        history: session.history(),
+        directories: session.directories(),
       });
     }
 

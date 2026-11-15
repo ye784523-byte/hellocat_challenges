@@ -46,6 +46,49 @@
 
       <main class="layout">
         <aside class="panel" id="panel">
+          <section class="info" id="info">
+            <div class="info__head">
+              <p class="info__kicker">CHALLENGE INFO</p>
+              <span class="info__id" id="info-id">—</span>
+            </div>
+
+            <h2 class="info__title" id="info-title">No challenge loaded</h2>
+
+            <div class="info__meta" id="info-meta">
+              <span class="diff diff--none">NO TARGET</span>
+            </div>
+
+            <p class="info__description" id="info-description">
+              Pick a target from the board to load its environment. The brief, the objective and
+              the hints live here while you work.
+            </p>
+
+            <div class="info__block">
+              <p class="info__label">OBJECTIVE</p>
+              <p class="info__objective" id="info-objective">—</p>
+            </div>
+
+            <dl class="info__facts">
+              <div class="info__fact">
+                <dt>PREREQUISITES</dt>
+                <dd id="info-prerequisites">none</dd>
+              </div>
+              <div class="info__fact">
+                <dt>HINTS</dt>
+                <dd id="info-hints">0</dd>
+              </div>
+              <div class="info__fact">
+                <dt>REWARD</dt>
+                <dd id="info-xp">0 XP</dd>
+              </div>
+            </dl>
+
+            <div class="info__actions">
+              <button class="btn" id="btn-hint" type="button">HINT</button>
+              <button class="btn btn--primary" id="btn-submit" type="button">SUBMIT FLAG</button>
+            </div>
+          </section>
+
           <div class="panel__head">
             <h2>CHALLENGES</h2>
             <span class="panel__count" id="challenge-count">0</span>
@@ -76,13 +119,12 @@
               <span class="stage__label">NO CHALLENGE LOADED</span>
               <span class="stage__hint">Pick one from the panel, or type <code>challenges</code>.</span>
             </div>
-            <div class="stage__actions">
-              <button class="btn" id="btn-hint" type="button">HINT</button>
-              <button class="btn btn--primary" id="btn-submit" type="button">SUBMIT FLAG</button>
-            </div>
+            <div class="stage__path" id="stage-path" title="Working directory">~</div>
           </div>
 
           <div class="terminal" id="terminal"></div>
+
+          <div class="hintbar" id="hintbar" hidden></div>
 
           <form class="flagbar" id="flag-form" hidden>
             <label class="flagbar__label" for="flag-input">FLAG</label>

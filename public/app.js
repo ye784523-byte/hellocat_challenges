@@ -35,6 +35,10 @@
     busy: false,
     filter: 'all',
     search: '',
+    // The history of the session, oldest first. It is seeded from the server
+    // so a reload does not lose the commands of the current lab.
+    history: [],
+    cwd: '/home/analyst',
   };
 
   const $ = (id) => document.getElementById(id);
@@ -133,6 +137,55 @@
     return `diff diff--${String(difficulty ?? '').toLowerCase()}`;
   }
 
+  /** The challenge the info panel describes: the loaded one, or the first. */
+  function activeChallenge() {
+    if (!state.challengeId) return null;
+    return state.challenges.find((challenge) => challenge.id === state.challengeId) ?? null;
+  }
+
+  /** Renders the brief of the loaded challenge in the left panel. */
+  function renderInfo() {
+    const challenge = activeChallenge();
+
+    if (!challenge) {
+      $('info-id').textContent = '—';
+      $('info-title').textContent = 'No challenge loaded';
+      $('info-meta').innerHTML = '<span class="diff diff--none">NO TARGET</span>';
+      $('info-description').textContent =
+        'Pick a target from the board to load its environment. The brief, the objective and the hints live here while you work.';
+      $('info-objective').textContent = '—';
+      $('info-prerequisites').textContent = 'none';
+      $('info-hints').textContent = '0';
+      $('info-xp').textContent = '0 XP';
+      return;
+    }
+
+    $('info-id').textContent = challenge.id;
+    $('info-title').textContent = challenge.title;
+    $('info-meta').innerHTML = `
+      <span class="${difficultyClass(challenge.difficulty)}">${escapeHtml(challenge.difficulty ?? 'Unknown')}</span>
+      <span class="info__category">${escapeHtml(challenge.category ?? '')}</span>`;
+
+    $('info-description').textContent =
+      challenge.description ?? 'No description for this target yet.';
+    $('info-objective').textContent = challenge.objective ?? '—';
+
+    const prerequisites = challenge.prerequisites ?? [];
+    $('info-prerequisites').textContent =
+      prerequisites.length > 0 ? prerequisites.join(', ') : 'none';
+
+    const hints = challenge.hints ?? 0;
+    const revealed = challenge.hintsRevealed ?? 0;
+    $('info-hints').textContent = hints > 0 ? `${revealed} of ${hints} revealed` : 'none';
+
+    $('info-xp').textContent = `${challenge.xp ?? 0} XP`;
+
+    // A sealed target says so, instead of failing when it is picked.
+    if (challenge.locked) {
+      $('info-description').textContent = `Sealed. Capture ${(challenge.missingPrerequisites ?? []).join(', ')} first to unseal this environment.`;
+    }
+  }
+
   function renderChallenges() {
     const list = $('challenge-list');
     list.innerHTML = '';
@@ -196,6 +249,7 @@
     state.challenges = payload.challenges ?? [];
     state.solved = new Set(state.challenges.filter((c) => c.solved).map((c) => c.id));
     renderChallenges();
+    renderInfo();
   }
 
   async function startChallenge(id) {
@@ -216,6 +270,7 @@
       write(payload.prompt);
 
       renderChallenges();
+      renderInfo();
       toast(`Loaded ${state.challengeId}`, 'ok');
     } catch (error) {
       toast(error.message, 'err');
@@ -244,7 +299,15 @@
     try {
       const payload = await api('/api/hint', { method: 'POST' });
       write(`\x1b[1;33mHint:\x1b[0m ${payload.text}\r\n`);
+
+      const bar = $('hintbar');
+      if (bar) {
+        bar.innerHTML = `<span class="hintbar__label">HINT ${payload.index + 1}</span><span class="hintbar__text">${escapeHtml(payload.text)}</span>`;
+        bar.hidden = false;
+      }
+
       toast(`Hint: ${payload.text}`, 'info', 8000);
+      await refreshProgress();
     } catch (error) {
       const message = error.payload?.message ?? error.message;
       write(`\x1b[33m${message}\x1b[0m\r\n`);
@@ -261,6 +324,19 @@
 
   /* ------------------------------------------------------------------- exec */
 
+  /** The working directory, shortened the way the prompt shortens it. */
+  function shortPath(cwd) {
+    const home = '/home/analyst';
+    if (!cwd) return '~';
+    return cwd.startsWith(home) ? `~${cwd.slice(home.length)}` : cwd;
+  }
+
+  function renderPath(cwd) {
+    state.cwd = cwd ?? state.cwd;
+    const node = $('stage-path');
+    if (node) node.textContent = shortPath(state.cwd);
+  }
+
   async function runCommand(command) {
     if (state.busy) return;
     state.busy = true;
@@ -269,6 +345,7 @@
       if (payload.stdout) write(payload.stdout);
       if (payload.stderr) write(payload.stderr);
       state.prompt = payload.prompt ?? state.prompt;
+      renderPath(payload.cwd);
       write(state.prompt);
     } catch (error) {
       write(`\x1b[31m${error.message}\x1b[0m\r\n`);
@@ -282,8 +359,11 @@
   function setupTerminalInput() {
     let buffer = '';
     let cursor = 0;
-    let history = [];
     let historyIndex = -1;
+
+    // The history of the session: the commands the server remembers plus the
+    // ones typed in this tab. The arrow keys walk it.
+    const history = () => state.history;
 
     const redraw = () => {
       state.terminal.write('\x1b[2K\r');
@@ -300,7 +380,10 @@
         buffer = '';
         cursor = 0;
         historyIndex = -1;
-        if (command.trim()) history.unshift(command);
+        if (command.trim()) {
+          state.history.push(command);
+          if (state.history.length > 500) state.history.shift();
+        }
         state.terminal.write('\r\n');
         if (command.trim()) await runCommand(command);
         else write(state.prompt ?? '');
@@ -316,24 +399,44 @@
         return;
       }
 
-      if (key === '\u001b[A') {
-        if (history.length > 0) {
-          historyIndex = Math.min(historyIndex + 1, history.length - 1);
-          buffer = history[historyIndex];
-          cursor = buffer.length;
-          redraw();
+      // The arrow keys walk the history: up goes back, down goes forward.
+      if (key === '\u001b[A' || key === '\u001b[B') {
+        const entries = history();
+        if (entries.length === 0) return;
+
+        if (key === '\u001b[A') {
+          historyIndex = Math.min(historyIndex + 1, entries.length - 1);
+        } else if (historyIndex > 0) {
+          historyIndex -= 1;
+        } else {
+          // One step below the oldest entry: the line is empty again.
+          historyIndex = -1;
         }
+
+        buffer = historyIndex === -1 ? '' : entries[entries.length - 1 - historyIndex];
+        cursor = buffer.length;
+        redraw();
         return;
       }
 
-      if (key === '\u001b[B') {
-        if (historyIndex > 0) {
-          historyIndex -= 1;
-          buffer = history[historyIndex];
-        } else {
-          historyIndex = -1;
-          buffer = '';
+      // Ctrl+R walks the history the other way round, from the newest entry.
+      if (key === '\u0012') {
+        const entries = history();
+        if (entries.length === 0) return;
+
+        const query = buffer.trim().toLowerCase();
+        const from = historyIndex === -1 ? entries.length - 1 : entries.length - 1 - historyIndex - 1;
+        let found = -1;
+        for (let index = from; index >= 0; index -= 1) {
+          if (!query || entries[index].toLowerCase().includes(query)) {
+            found = index;
+            break;
+          }
         }
+        if (found === -1) return;
+
+        historyIndex = entries.length - 1 - found;
+        buffer = entries[found];
         cursor = buffer.length;
         redraw();
         return;
@@ -342,6 +445,7 @@
       if (key === '\u0003') {
         buffer = '';
         cursor = 0;
+        historyIndex = -1;
         write('^C\r\n');
         write(state.prompt ?? '');
         return;
@@ -355,6 +459,9 @@
       if (key === '\t') {
         return;
       }
+
+      // Any other key starts a new line, so the history is left behind.
+      if (buffer.length === 0) historyIndex = -1;
 
       // Ignore other control sequences.
       if (key < ' ' && key !== '\t') return;
@@ -446,6 +553,11 @@
 
       state.prompt = payload.prompt ?? buildPrompt(payload.cwd, payload.hostname);
       write(state.prompt);
+
+      // The history of the session survives a reload.
+      state.history = [...(payload.history ?? [])];
+      renderPath(payload.cwd);
+      renderInfo();
 
       await loadChallenges();
 

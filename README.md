@@ -453,13 +453,62 @@ operators lives there.
 
 Flags can also be submitted from the **SUBMIT FLAG** button above the terminal.
 
+### The layout
+
+The application is split in two: **the brief takes the left 40%** and the
+terminal the right 60%.
+
+- **Left — the brief.** The id, the title, the difficulty, the category, the
+  description, the objective, the prerequisites, the hints and the reward of
+  the loaded challenge, with the **HINT** and **SUBMIT FLAG** buttons. Below
+  it, the board of every challenge with the search box and the filters.
+- **Right — the terminal.** The banner, the working directory and the prompt,
+  the simulated host, the flag bar and the last hint.
+
+On a phone the brief becomes a drawer that the ☰ button opens, so the
+terminal keeps the whole screen.
+
+### Moving between folders
+
+The working directory is real: it persists between commands, it is shown in
+the prompt and in the header, and every command that takes a path resolves it
+against the current directory.
+
+```bash
+cd /var/log        # an absolute path
+cd notes           # a relative path
+cd ..              # one level up
+cd ~               # the home directory
+cd -               # the previous directory
+pushd /etc/ssh     # push a directory on the stack and move into it
+dirs               # show the stack
+popd               # go back to the directory underneath
+pwd                # where am I
+```
+
+### The command history
+
+Every command is remembered by the session, so the history survives a reload.
+
+| Key | What it does |
+| --- | --- |
+| `↑` | the previous command |
+| `↓` | the next command |
+| `Ctrl`+`R` | search the history backwards |
+| `!!` | repeat the last command |
+| `history` | print the history |
+| `history -c` | clear it |
+
+A recalled command can be edited before it runs, like in a real shell.
+
 ### Sealed labs
 
 A challenge can require other challenges to be captured first
 (`prerequisites` in the challenge definition). While the gate is closed the
 terminal refuses to load the environment and refuses the flag submission, and
 the sidebar marks the entry with 🔒. The gate is evaluated per operator: once
-the prerequisite is captured, the lab opens for that operator only.
+the prerequisite is captured, the lab opens for that operator only. The brief
+in the left panel names the prerequisites that are still missing.
 
 ### Command highlights
 
