@@ -1055,7 +1055,7 @@ body.nav-open .dock {
   transform: none;
 }
 
-/* ----------------------------------------------------------- the terminal */
+/* ---------------------------------------------------------- terminal mock */
 
 .mock__prompt {
   color: var(--green);
